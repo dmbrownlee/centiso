@@ -1,0 +1,78 @@
+---
+- hosts: all
+  vars:
+    iso_filename: 'CentOS-7-x86_64-Everything-1611.iso'
+    iso_location: 'http://centos.s.uw.edu/centos/7/isos/x86_64/'
+    iso_checksum: 'af4969ebbdc479d330de97c5bfbb37eedc64c369f009cb15a97f9553ba441c88'
+    iso_checksum_algo: 'sha256'
+    resource_root: "/vagrant"
+    build_root: "{{ ansible_user_dir }}/iso_build_root"
+  tasks:
+  - name: Install the needed utilities
+    yum:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - genisoimage
+      - createrepo
+    become: yes
+  - name: Create the destination directory structure for new ISO image
+    file:
+      path: "{{ item }}"
+      state: directory
+    with_items:
+      - "{{ resource_root }}"
+      - "{{ build_root }}"
+      - "{{ build_root }}/isolinux"
+      - "{{ build_root }}/isolinux/images"
+      - "{{ build_root }}/isolinux/images/pxeboot"
+      - "{{ build_root }}/isolinux/ks"
+      - "{{ build_root }}/isolinux/LiveOS"
+      - "{{ build_root }}/isolinux/Packages"
+      - "{{ build_root }}/isolinux/CustomRPMs"
+      - "{{ build_root }}/utils"
+      - "{{ build_root }}/mnt"
+  - name: Download the ISO
+    get_url:
+      url: "{{ iso_location }}/{{ iso_filename }}"
+      dest: "{{ resource_root }}/{{ iso_filename }}"
+      checksum: "{{ iso_checksum_algo }}:{{ iso_checksum }}"
+  - name: Mount the ISO image
+    mount:
+      src: "{{ resource_root }}/{{ iso_filename }}"
+      path: "{{ build_root }}/mnt"
+      state: mounted
+      fstype: iso9660
+      opts: loop,ro
+    become: yes
+  - name: Copy needed files from media to destination directories
+    command: rsync -avPS "{{ item.src }}" "{{ item.dest }}"
+    with_items:
+      - { src: '{{ build_root }}/mnt/isolinux/', dest: '{{ build_root }}/isolinux/' }
+      - { src: '{{ build_root }}/mnt/images/', dest: '{{ build_root }}/isolinux/images/' }
+      - { src: '{{ build_root }}/mnt/LiveOS/', dest: '{{ build_root }}/isolinux/LiveOS/' }
+      - { src: '{{ build_root }}/mnt/.discinfo', dest: '{{ build_root }}/isolinux/' }
+  - name: Copy RPMs from media to destination Packages directory
+    command: rsync -avPS "{{ item.src }}" "{{ item.dest }}"
+    with_items:
+      - { src: '{{ build_root }}/mnt/Packages/', dest: '{{ build_root }}/isolinux/Packages/' }
+  - name: Copy additional RPMs from resource_root share to the destination CustomRPMs directory
+    command: rsync -avPS "{{ item.src }}" "{{ item.dest }}"
+    with_items:
+      - { src: '{{ resource_root }}/ansible/CustomRPMs/', dest: '{{ build_root }}/isolinux/CustomRPMs/' }
+  - name: Update the CustomRPMs repo
+    command: createrepo .
+    args:
+      chdir: "{{ build_root }}/isolinux/CustomRPMs"
+  - name: Copy the kickstart file to destination directory for new ISO image
+    copy:
+      src: ks.cfg
+      dest: '{{ build_root }}/isolinux/ks/ks.cfg'
+  - name: Update the isolinux.cfg with custom version
+    copy:
+      src: isolinux.cfg
+      dest: '{{ build_root }}/isolinux/isolinux.cfg'
+  - name: Create the ISO image from the destination directory
+    command: genisoimage -untranslated-filenames -V 'CentOS 7 x86_64' -J -joliet-long -rational-rock -translation-table -input-charset utf-8 -x ./lost+found -b isolinux.bin -c boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -o "{{ resource_root }}/CentOS-7-x86_64-Custom.iso" -T isolinux/
+    args:
+      chdir: "{{ build_root }}"
