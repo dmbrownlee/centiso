@@ -64,6 +64,11 @@
     command: rsync -avPS "{{ item.src }}" "{{ item.dest }}"
     with_items:
       - { src: '{{ workspace }}/CustomRPMs/', dest: '{{ build_root }}/isolinux/CustomRPMs/' }
+  - name: Download the chefdk RPM
+    get_url:
+      url: "https://packages.chef.io/files/stable/chefdk/1.4.3/el/7/chefdk-1.4.3-1.el7.x86_64.rpm"
+      dest: "{{ build_root }}/isolinux/CustomRPMs/chefdk-1.4.3-1.el7.x86_64.rpm"
+      checksum: "sha256:bb70be05a6a99071d26ec288d338459fe71fdd6ab0e4cbb661ae66dfb6c82fc5"
   - name: Update the CustomRPMs repo
     command: createrepo .
     args:
