@@ -72,6 +72,10 @@
     copy:
       src: "{{ workspace }}/files/ks.cfg"
       dest: "{{ build_root }}/isolinux/ks/ks.cfg"
+  - name: Copy the kickstart file to destination directory for new ISO image
+    copy:
+      src: "{{ workspace }}/files/buildbox-ks.cfg"
+      dest: "{{ build_root }}/isolinux/ks/buildbox-ks.cfg"
   - name: Update the isolinux.cfg with custom version
     copy:
       src: "{{ workspace }}/files/isolinux.cfg"
