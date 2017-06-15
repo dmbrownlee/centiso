@@ -5,7 +5,7 @@
     iso_location: 'http://centos.s.uw.edu/centos/7/isos/x86_64/'
     iso_checksum: 'af4969ebbdc479d330de97c5bfbb37eedc64c369f009cb15a97f9553ba441c88'
     iso_checksum_algo: 'sha256'
-    iso_local_dir: "/var/centiso"
+    centiso_var: "/var/centiso"
     workspace: "{{ ansible_user_dir }}/centiso"
     build_root: "{{ ansible_user_dir }}/iso_build_root"
   tasks:
@@ -22,9 +22,9 @@
       path: "{{ item }}"
       state: directory
     with_items:
-      - "{{ iso_local_dir }}"
+      - "{{ centiso_var }}"
+      - "{{ centiso_var }}/CustomRPMs"
       - "{{ workspace }}"
-      - "{{ workspace }}/CustomRPMs"
       - "{{ workspace }}/files"
       - "{{ build_root }}"
       - "{{ build_root }}/isolinux"
@@ -39,11 +39,11 @@
   - name: Download the ISO
     get_url:
       url: "{{ iso_location }}/{{ iso_filename }}"
-      dest: "{{ iso_local_dir }}/{{ iso_filename }}"
+      dest: "{{ centiso_var }}/{{ iso_filename }}"
       checksum: "{{ iso_checksum_algo }}:{{ iso_checksum }}"
   - name: Mount the ISO image
     mount:
-      src: "{{ iso_local_dir }}/{{ iso_filename }}"
+      src: "{{ centiso_var }}/{{ iso_filename }}"
       path: "{{ build_root }}/mnt"
       state: mounted
       fstype: iso9660
@@ -69,7 +69,7 @@
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
     with_items:
-      - { src: '{{ workspace }}/CustomRPMs/', dest: '{{ build_root }}/isolinux/CustomRPMs/' }
+      - { src: '{{ centiso_var }}/CustomRPMs/', dest: '{{ build_root }}/isolinux/CustomRPMs/' }
   - name: Download the chefdk RPM
     get_url:
       url: "https://packages.chef.io/files/stable/chefdk/1.4.3/el/7/chefdk-1.4.3-1.el7.x86_64.rpm"
@@ -92,6 +92,6 @@
       src: "{{ workspace }}/files/isolinux.cfg"
       dest: '{{ build_root }}/isolinux/isolinux.cfg'
   - name: Create the ISO image from the destination directory
-    command: genisoimage -untranslated-filenames -V 'CentOS 7 x86_64' -J -joliet-long -rational-rock -translation-table -input-charset utf-8 -x ./lost+found -b isolinux.bin -c boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -o "{{ iso_local_dir }}/CentOS-7-x86_64-Custom.iso" -T isolinux/
+    command: genisoimage -untranslated-filenames -V 'CentOS 7 x86_64' -J -joliet-long -rational-rock -translation-table -input-charset utf-8 -x ./lost+found -b isolinux.bin -c boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -o "{{ centiso_var }}/CentOS-7-x86_64-Custom.iso" -T isolinux/
     args:
       chdir: "{{ build_root }}"
