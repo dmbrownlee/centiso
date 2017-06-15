@@ -50,18 +50,24 @@
       opts: loop,ro
     become: yes
   - name: Copy needed files from media to destination directories
-    command: rsync -avPS "{{ item.src }}" "{{ item.dest }}"
+    synchronize:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
     with_items:
       - { src: '{{ build_root }}/mnt/isolinux/', dest: '{{ build_root }}/isolinux/' }
       - { src: '{{ build_root }}/mnt/images/', dest: '{{ build_root }}/isolinux/images/' }
       - { src: '{{ build_root }}/mnt/LiveOS/', dest: '{{ build_root }}/isolinux/LiveOS/' }
       - { src: '{{ build_root }}/mnt/.discinfo', dest: '{{ build_root }}/isolinux/' }
   - name: Copy RPMs from media to destination Packages directory
-    command: rsync -avPS "{{ item.src }}" "{{ item.dest }}"
+    synchronize:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
     with_items:
       - { src: '{{ build_root }}/mnt/Packages/', dest: '{{ build_root }}/isolinux/Packages/' }
   - name: Copy additional RPMs from workspace share to the destination CustomRPMs directory
-    command: rsync -avPS "{{ item.src }}" "{{ item.dest }}"
+    synchronize:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
     with_items:
       - { src: '{{ workspace }}/CustomRPMs/', dest: '{{ build_root }}/isolinux/CustomRPMs/' }
   - name: Download the chefdk RPM
