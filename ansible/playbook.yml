@@ -81,8 +81,8 @@
       chdir: "{{ build_root }}/isolinux/CustomRPMs"
   - name: Copy the kickstart files to destination directory for new ISO image
     copy:
-      src: "{{ workspace }}/files/ks.cfg"
-      dest: "{{ build_root }}/isolinux/ks/ks.cfg"
+      src: "{{ workspace }}/files/{{ item }}"
+      dest: "{{ build_root }}/isolinux/ks/{{ item }}"
     with_items:
       - ks.cfg
       - buildbox-ks.cfg
