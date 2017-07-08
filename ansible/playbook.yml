@@ -2,4 +2,3 @@
 - hosts: buildbox
   roles:
     - role: localrepo
-    - role: buildbox
