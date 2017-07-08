@@ -1,4 +1,5 @@
 ---
-- hosts: all
+- hosts: buildbox
   roles:
+    - role: localrepo
     - role: buildbox
