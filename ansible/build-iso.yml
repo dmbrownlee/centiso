@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: localhost
   vars:
     iso_filename: 'CentOS-7-x86_64-Everything-1611.iso'
     iso_location: 'http://centos.s.uw.edu/centos/7/isos/x86_64/'
