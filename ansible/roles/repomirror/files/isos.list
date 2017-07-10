@@ -1,0 +1,17 @@
+# Exclude these packages from the sync of isos/x86_64
+0_README.txt
+CentOS-7-x86_64-DVD-1611.iso
+CentOS-7-x86_64-DVD-1611.torrent
+CentOS-7-x86_64-Everything-1611.iso
+CentOS-7-x86_64-Everything-1611.torrent
+CentOS-7-x86_64-LiveGNOME-1611.iso
+CentOS-7-x86_64-LiveGNOME-1611.torrent
+CentOS-7-x86_64-LiveKDE-1611.iso
+CentOS-7-x86_64-LiveKDE-1611.torrent
+CentOS-7-x86_64-Minimal-1611.torrent
+CentOS-7-x86_64-NetInstall-1611.iso
+CentOS-7-x86_64-NetInstall-1611.torrent
+sha1sum.txt
+sha1sum.txt.asc
+sha256sum.txt
+sha256sum.txt.asc
