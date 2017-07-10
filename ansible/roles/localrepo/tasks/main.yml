@@ -48,3 +48,24 @@
     group: root
     mode: 0750
   become: yes
+- name: Ensure sync script excludes directory exists
+  file:
+    path: /etc/syncrepos/excludes
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  become: yes
+- name: Ensure exclude lists are installed
+  copy:
+    dest: /etc/syncrepos/excludes/{{ item }}
+    src: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - os.list
+    - updates.list
+    - centosplus.list
+    - extras.list
+  become: yes
