@@ -15,6 +15,7 @@
     state: directory
   with_items:
     - os
+    - isos
     - updates
     - centosplus
     - extras
