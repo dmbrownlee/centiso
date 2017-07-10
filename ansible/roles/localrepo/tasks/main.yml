@@ -4,10 +4,27 @@
     name: httpd
     state: present
   become: yes
-- name: Ensure directory for content exists
+- name: Ensure top level directory for content exists
   file:
-    path: /var/www/html/repos/centos
+    path: /var/www/html/repos/centos/7.3.1611
     state: directory
+  become: yes
+- name: Ensure repo subdirectories exists
+  file:
+    path: /var/www/html/repos/centos/7.3.1611/{{ item }}/x86_64
+    state: directory
+  with_items:
+    - os
+    - updates
+    - centosplus
+    - extras
+    - local
+  become: yes
+- name: Ensure release link exists
+  file:
+    path: /var/www/html/repos/centos/7
+    src: /var/www/html/repos/centos/7.3.1611
+    state: link
   become: yes
 - name: Ensure firewall permits web traffic
   firewalld:
@@ -22,4 +39,12 @@
     name: httpd
     state: started
     enabled: yes
+  become: yes
+- name: Ensure repo sync script is installed
+  copy:
+    dest: /usr/local/bin/syncrepos
+    src: syncrepos
+    owner: root
+    group: root
+    mode: 0750
   become: yes
