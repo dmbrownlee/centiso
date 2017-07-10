@@ -66,6 +66,7 @@
     mode: 0644
   with_items:
     - os.list
+    - isos.list
     - updates.list
     - centosplus.list
     - extras.list
