@@ -1,4 +1,4 @@
 ---
-- hosts: buildbox
+- hosts: repomirror
   roles:
     - role: repomirror
