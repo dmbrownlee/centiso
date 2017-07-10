@@ -1,9 +1,8 @@
 #!/bin/bash
-BASEURL=rsync://foo/
+BASEURL=rsync://centos.mirrors.tds.net/centos/7.3.1611
 LOCALDIR=/var/www/html/repos/centos/7
 
 for repo in os updates centosplus extras; do
   rsync -avz $BASEURL/$repo/x86_64/ $LOCALDIR/$repo/x86_64/
-  createrepo --update $LOCALDIR/$repo/x86_64/
 done
 
