@@ -1,0 +1,11 @@
+---
+- name: Ensure default repositories are disabled but saved
+  command: mv {{ item }} {{ item }}.orig
+  become: yes
+  with_items:
+    - /etc/yum.repos.d/CentOS-Base.repo
+- name: Ensure local repo mirror is enabled
+  copy:
+    path: /etc/yum.repos.d/local.repo
+    src: local.repo
+  become: yes

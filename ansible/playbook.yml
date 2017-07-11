@@ -1,4 +1,7 @@
 ---
+- hosts: all
+  roles:
+    - role: use-local-repo
 - hosts: repomirror
   roles:
     - role: repomirror
