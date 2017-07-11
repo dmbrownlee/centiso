@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: localhost
   vars:
     iso_filename: 'CentOS-7-x86_64-Everything-1611.iso'
     iso_location: 'http://10.1.1.254/repos/centos/7/isos/x86_64/'
@@ -64,17 +64,22 @@
       dest: "{{ item.dest }}"
     with_items:
       - { src: '{{ build_root }}/mnt/Packages/', dest: '{{ build_root }}/isolinux/Packages/' }
+  - name: Ensure the chefdk RPM has been downloaded
+    get_url:
+      url: "https://packages.chef.io/files/stable/chefdk/1.4.3/el/7/chefdk-1.4.3-1.el7.x86_64.rpm"
+      dest: "{{ centiso_var }}/CustomRPMs/chefdk-1.4.3-1.el7.x86_64.rpm"
+      checksum: "sha256:bb70be05a6a99071d26ec288d338459fe71fdd6ab0e4cbb661ae66dfb6c82fc5"
+  - name: Ensure the chef-server-core RPM has been downloaded
+    get_url:
+      url: "https://packages.chef.io/files/stable/chef-server/12.15.8/el/7/chef-server-core-12.15.8-1.el7.x86_64.rpm"
+      dest: "{{ centiso_var }}/CustomRPMs/chef-server-core-12.15.8-1.el7.x86_64.rpm"
+      checksum: "sha256:a39b70bbbc8ba60d54c827d2a002f7b1d4f48629f8316ae59ae21ab2c73396d8"
   - name: Ensure additional RPMs are copied from workspace share to the destination CustomRPMs directory
     synchronize:
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
     with_items:
       - { src: '{{ centiso_var }}/CustomRPMs/', dest: '{{ build_root }}/isolinux/CustomRPMs/' }
-  - name: Ensure the chefdk RPM has been downloaded
-    get_url:
-      url: "https://packages.chef.io/files/stable/chefdk/1.4.3/el/7/chefdk-1.4.3-1.el7.x86_64.rpm"
-      dest: "{{ build_root }}/isolinux/CustomRPMs/chefdk-1.4.3-1.el7.x86_64.rpm"
-      checksum: "sha256:bb70be05a6a99071d26ec288d338459fe71fdd6ab0e4cbb661ae66dfb6c82fc5"
   - name: Ensure the repodata has been updated
     command: "createrepo -g {{ build_root }}/mnt/repodata/d918936f5019be3fb66e9981a28cb2a41477a2963d741d454f79377a22214f43-c7-x86_64-comps.xml ."
     args:
