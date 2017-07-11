@@ -2,7 +2,7 @@
 - hosts: buildbox
   vars:
     iso_filename: 'CentOS-7-x86_64-Everything-1611.iso'
-    iso_location: 'http://centos.s.uw.edu/centos/7/isos/x86_64/'
+    iso_location: 'http://10.1.1.254/repo/centos/7/isos/x86_64/'
     iso_checksum: 'af4969ebbdc479d330de97c5bfbb37eedc64c369f009cb15a97f9553ba441c88'
     iso_checksum_algo: 'sha256'
     centiso_var: "/var/centiso"
