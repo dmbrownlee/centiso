@@ -26,3 +26,10 @@ gpgcheck=1
 enabled=0
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
 
+#locally sourced packages
+[local]
+name=CentOS-$releasever - Local
+baseurl=http://10.1.1.254/repos/centos/$releasever/local/$basearch/
+gpgcheck=0
+enabled=1
+
