@@ -85,7 +85,6 @@
       dest: "{{ build_root }}/isolinux/ks/{{ item }}"
     with_items:
       - ks.cfg
-      - buildbox-ks.cfg
       - workstation-ks.cfg
   - name: Ensure isolinux.cfg is customized
     copy:
