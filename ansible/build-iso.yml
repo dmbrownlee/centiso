@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: buildbox
   vars:
     iso_filename: 'CentOS-7-x86_64-Everything-1611.iso'
     iso_location: 'http://centos.s.uw.edu/centos/7/isos/x86_64/'
@@ -9,7 +9,7 @@
     workspace: "{{ ansible_user_dir }}/centiso"
     build_root: "{{ ansible_user_dir }}/iso_build_root"
   tasks:
-  - name: Install the needed utilities
+  - name: Ensure packages needed to build the ISO image are installed
     yum:
       name: "{{ item }}"
       state: present
@@ -17,7 +17,7 @@
       - genisoimage
       - createrepo
     become: yes
-  - name: Create the destination directory structure for new ISO image
+  - name: Ensure directories for building the new ISO image exist
     file:
       path: "{{ item }}"
       state: directory
@@ -36,12 +36,12 @@
       - "{{ build_root }}/isolinux/CustomRPMs"
       - "{{ build_root }}/utils"
       - "{{ build_root }}/mnt"
-  - name: Download the ISO
+  - name: Ensure we have an ISO image to use as a starting point
     get_url:
       url: "{{ iso_location }}/{{ iso_filename }}"
       dest: "{{ centiso_var }}/{{ iso_filename }}"
       checksum: "{{ iso_checksum_algo }}:{{ iso_checksum }}"
-  - name: Mount the ISO image
+  - name: Ensure the original ISO image is mounted
     mount:
       src: "{{ centiso_var }}/{{ iso_filename }}"
       path: "{{ build_root }}/mnt"
@@ -49,7 +49,7 @@
       fstype: iso9660
       opts: loop,ro
     become: yes
-  - name: Copy needed files from media to destination directories
+  - name: Ensure necessary files have been copied to destination directories
     synchronize:
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
@@ -58,28 +58,28 @@
       - { src: '{{ build_root }}/mnt/images/', dest: '{{ build_root }}/isolinux/images/' }
       - { src: '{{ build_root }}/mnt/LiveOS/', dest: '{{ build_root }}/isolinux/LiveOS/' }
       - { src: '{{ build_root }}/mnt/.discinfo', dest: '{{ build_root }}/isolinux/' }
-  - name: Copy RPMs from media to destination Packages directory
+  - name: Ensure RPMs from original media are copied to destination Packages directory
     synchronize:
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
     with_items:
       - { src: '{{ build_root }}/mnt/Packages/', dest: '{{ build_root }}/isolinux/Packages/' }
-  - name: Copy additional RPMs from workspace share to the destination CustomRPMs directory
+  - name: Ensure additional RPMs are copied from workspace share to the destination CustomRPMs directory
     synchronize:
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
     with_items:
       - { src: '{{ centiso_var }}/CustomRPMs/', dest: '{{ build_root }}/isolinux/CustomRPMs/' }
-  - name: Download the chefdk RPM
+  - name: Ensure the chefdk RPM has been downloaded
     get_url:
       url: "https://packages.chef.io/files/stable/chefdk/1.4.3/el/7/chefdk-1.4.3-1.el7.x86_64.rpm"
       dest: "{{ build_root }}/isolinux/CustomRPMs/chefdk-1.4.3-1.el7.x86_64.rpm"
       checksum: "sha256:bb70be05a6a99071d26ec288d338459fe71fdd6ab0e4cbb661ae66dfb6c82fc5"
-  - name: Update the CustomRPMs repo
+  - name: Ensure the repodata has been updated
     command: "createrepo -g /root/iso_build_root/mnt/repodata/d918936f5019be3fb66e9981a28cb2a41477a2963d741d454f79377a22214f43-c7-x86_64-comps.xml ."
     args:
       chdir: "{{ build_root }}/isolinux"
-  - name: Copy the kickstart files to destination directory for new ISO image
+  - name: Ensure the kickstart files have been copied to the new ISO directories
     copy:
       src: "{{ workspace }}/files/{{ item }}"
       dest: "{{ build_root }}/isolinux/ks/{{ item }}"
@@ -87,11 +87,11 @@
       - ks.cfg
       - buildbox-ks.cfg
       - workstation-ks.cfg
-  - name: Update the isolinux.cfg with custom version
+  - name: Ensure isolinux.cfg is customized
     copy:
       src: "{{ workspace }}/files/isolinux.cfg"
       dest: '{{ build_root }}/isolinux/isolinux.cfg'
-  - name: Create the ISO image from the destination directory
+  - name: Ensure a new ISO image is created from the destination directory
     command: genisoimage -untranslated-filenames -V 'CentOS 7 x86_64' -J -joliet-long -rational-rock -translation-table -input-charset utf-8 -x ./lost+found -b isolinux.bin -c boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -o "{{ centiso_var }}/CentOS-7-x86_64-Custom.iso" -T isolinux/
     args:
       chdir: "{{ build_root }}"
