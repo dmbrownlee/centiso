@@ -1,5 +1,5 @@
 ---
-- hosts: buildbox
+- hosts: all
   vars:
     iso_filename: 'CentOS-7-x86_64-Everything-1611.iso'
     iso_location: 'http://10.1.1.254/repos/centos/7/isos/x86_64/'

@@ -1,3 +1,2 @@
 localhost ansible_connection=local
 repomirror ansible_connection=local
-buildbox ansible_connection=local
