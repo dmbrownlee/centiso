@@ -76,7 +76,7 @@
       dest: "{{ build_root }}/isolinux/CustomRPMs/chefdk-1.4.3-1.el7.x86_64.rpm"
       checksum: "sha256:bb70be05a6a99071d26ec288d338459fe71fdd6ab0e4cbb661ae66dfb6c82fc5"
   - name: Ensure the repodata has been updated
-    command: "createrepo -g /root/iso_build_root/mnt/repodata/d918936f5019be3fb66e9981a28cb2a41477a2963d741d454f79377a22214f43-c7-x86_64-comps.xml ."
+    command: "createrepo -g {{ build_root }}/mnt/repodata/d918936f5019be3fb66e9981a28cb2a41477a2963d741d454f79377a22214f43-c7-x86_64-comps.xml ."
     args:
       chdir: "{{ build_root }}/isolinux"
   - name: Ensure the kickstart files have been copied to the new ISO directories
