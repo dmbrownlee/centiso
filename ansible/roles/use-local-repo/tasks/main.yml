@@ -1,11 +1,15 @@
 ---
+- name: Get status of repo files
+  stat:
+    path: /etc/yum.repos.d/CentOS-Base.repo
+  register: base_repo
+  failed_when: false
 - name: Ensure default repositories are disabled but saved
-  command: mv {{ item }} {{ item }}.orig
+  command: mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.orig
   become: yes
-  with_items:
-    - /etc/yum.repos.d/CentOS-Base.repo
+  when: base_repo.stat.exists
 - name: Ensure local repo mirror is enabled
   copy:
-    path: /etc/yum.repos.d/local.repo
+    dest: /etc/yum.repos.d/local.repo
     src: local.repo
   become: yes
