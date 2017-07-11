@@ -1,0 +1,6 @@
+---
+- name: Ensure chef server package is installed
+  yum:
+    name: chef-server-core
+    state: present
+  become: yes

@@ -1,0 +1,6 @@
+---                                                                              
+- name: Ensure chefdk package is installed                                  
+  yum:                                                                           
+    name: chefdk
+    state: present                                                               
+  become: yes

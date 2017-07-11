@@ -5,3 +5,9 @@
 - hosts: repomirror
   roles:
     - role: repomirror
+- hosts: chefserver
+  roles:
+    - role: chefserver
+- hosts: chefworkstation
+  roles:
+    - role: chefworkstation
