@@ -1,2 +1,4 @@
 localhost ansible_connection=local
 repomirror ansible_connection=local
+chefserver ansible_connection=local
+chefworkstation ansible_connection=local
