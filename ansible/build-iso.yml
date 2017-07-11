@@ -7,7 +7,7 @@
     iso_checksum_algo: 'sha256'
     centiso_var: "/var/centiso"
     workspace: "{{ ansible_user_dir }}/centiso"
-    build_root: "{{ ansible_user_dir }}/iso_build_root"
+    build_root: "{{ centiso_var }}/iso_build_root"
   tasks:
   - name: Ensure packages needed to build the ISO image are installed
     yum:
