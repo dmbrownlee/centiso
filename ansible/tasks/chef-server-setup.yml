@@ -27,9 +27,11 @@
     - name: Ensure initial user has been created
       command: chef-server-ctl user-create {{ username }} {{ userfirst }} {{ userlast }} {{ useremail }} '{{ userpass }}' --filename {{ keydir }}/{{ username }}.pem
       become: yes
+      ignore_errors: yes
     - name: Ensure initial org has been created
       command: chef-server-ctl org-create {{ orgname }} '{{ orgdisplayname }}' --association_user {{ username }} --filename {{ keydir }}/{{ orgname }}-validator.pem
       become: yes
+      ignore_errors: yes
     - name: Ensure chef-manage is installed
       command: chef-server-ctl install chef-manage
       become: yes
