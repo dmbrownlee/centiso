@@ -13,6 +13,10 @@
   #  - orgdisplayname: 'Example Company'
 
   tasks:
+    - name: Ensure the chef server package is installed
+      yum:
+        name: chef-server-core
+        state: present
     - name: Ensure we have a default place to store keys
       file:
         path: "{{ keydir }}"
@@ -57,4 +61,3 @@
         immediate: yes
         permanent: yes
       become: yes
-
