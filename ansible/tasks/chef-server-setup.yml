@@ -1,7 +1,7 @@
 ---
 - hosts: localhost
   vars:
-    - keydir: /etc/defaults/chefserver/keys
+    - keydir: /etc/default/chefserver/keys
   # You need to edit these values before running the setup script tasks.
   # TODO: move this to ansible vault
   #  - username: jdoe

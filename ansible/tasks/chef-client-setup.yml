@@ -2,6 +2,7 @@
 - hosts: localhost
   vars:
     - appname: chef-repo
+    - keydir: /etc/default/chefserver/keys
     #- username: jdoe
     #- orgname: example
   tasks:
@@ -30,9 +31,9 @@
           current_dir = File.dirname(__FILE__)
           log_level                :info
           log_location             STDOUT
-          node_name                'USER'
+          node_name                '{{ username }}'
           client_key               "#{current_dir}/{{ username }}.pem"
-          validation_client_name   'ORG_NAME-validator'
+          validation_client_name   '{{ orgname }}-validator'
           validation_key           "#{current_dir}/{{ orgname }}-validator.pem"
           chef_server_url          'https://{{ ansible_hostname }}/organizations/{{ orgname }}'
           cache_type               'BasicFile'
@@ -42,5 +43,13 @@
       lineinfile:
         path: "{{ ansible_user_dir }}/.bash_profile"
         line: 'export PATH="/opt/chefdk/embedded/bin:$PATH"'
-    - name: SSL fetch
-      command: knife ssl fetch
+    - name: Copy user cert
+      copy:
+        dest: "{{ ansible_user_dir }}/{{ appname }}/.chef/{{ username }}.pem"
+        src: "{{ keydir }}/{{ username }}.pem"
+        remote_src: yes
+    - name: Copy server cert
+      copy:
+        dest: "{{ ansible_user_dir }}/{{ appname }}/.chef/trusted_certs/{{ orgname }}-validator.pem"
+        src: "{{ keydir }}/{{ orgname }}-validator.pem"
+        remote_src: yes
