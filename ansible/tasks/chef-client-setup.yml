@@ -5,6 +5,11 @@
     #- username: jdoe
     #- orgname: example
   tasks:
+    - name: Ensure chefdk is already installed
+      yum:
+        name: chefdk
+        state: present
+      become: yes
     - name: Create the initial app
       command: chef generate app {{ appname }}
       args:
