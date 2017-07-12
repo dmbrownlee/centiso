@@ -37,7 +37,7 @@
       command: chef-server-ctl reconfigure
       become: yes
     - name: Ensure chef-manage-ctl reconfigure is run after installation
-      command: chef-manage-ctl reconfigure --accept-licinse
+      command: chef-manage-ctl reconfigure --accept-license
       become: yes
     - name: Ensure opscode-push-jobs-server is installed
       command: chef-server-ctl install opscode-push-jobs-server
