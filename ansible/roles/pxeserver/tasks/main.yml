@@ -30,8 +30,8 @@
   become: yes
 - name: Ensure the kernel and initrd.img launched by pxelinux exist
   synchronize:
-    dest: "{{ tftproot }}/{{ item }}"
-    src: "{{ rsync_mirror }}/{{ item }}"
+    dest: "{{ tftproot }}/pxelinux/{{ item }}"
+    src: "{{ rsync_mirror }}/{{ release_full }}/os/x86_64/isolinux/{{ item }}"
   with_items:
     - vmlinuz
     - initrd.img
