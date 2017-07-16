@@ -61,9 +61,6 @@
   synchronize:
     dest: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/exclude.list"
     src: "{{ item }}.list"
-    owner: root
-    group: root
-    mode: 0644
   with_items:
     - os
     - isos
