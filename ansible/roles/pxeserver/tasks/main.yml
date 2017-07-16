@@ -13,7 +13,7 @@
     path: /etc/xinetd.d/tftp
     state: present
     regexp: "^(	disable.*=.)yes$"
-    line: "\1no"
+    line: '\1no'
   become: yes
 - name: Ensure directories for PXE content exit
   file:
