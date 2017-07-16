@@ -40,6 +40,7 @@
       - 'images'
       - 'LiveOS'
       - 'Packages'
+      - 'repodata'
   - name: Ensure .discinfo file exists in the ISO root
     synchronize:
       src: '{{ workspace }}/files/discinfo'
