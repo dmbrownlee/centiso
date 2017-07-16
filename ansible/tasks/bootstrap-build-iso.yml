@@ -1,0 +1,81 @@
+---
+- hosts: localhost
+  vars:
+    rsync_repo: 'rsync://centos.eecs.wsu.edu/centos/7/os/x86_64'
+    centiso_var: "/var/centiso"
+    workspace: "{{ ansible_user_dir }}/centiso"
+    iso_root: "{{ centiso_var }}/iso"
+  tasks:
+  - name: Ensure packages needed to build the ISO image are installed
+    yum:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - genisoimage
+      - createrepo
+    become: yes
+  - name: Ensure directories for building the new ISO image exist
+    file:
+      path: "{{ item }}"
+      state: directory
+    with_items:
+      - "{{ centiso_var }}"
+      - "{{ centiso_var }}/CustomRPMs"
+      - "{{ iso_root }}"
+      - "{{ iso_root }}/ks"
+      - "{{ iso_root }}/CustomRPMs"
+  - name: Ensure isolinux files have been copied (except for isolinux.cfg)
+    synchronize:
+      src: "{{ rsync_repo }}/isolinux"
+      dest: "{{ iso_root }}"
+      recursive: yes
+      rsync_opts:
+        - "--exclude=isolinux.cfg"
+  - name: Ensure necessary files have been copied to destination directories
+    synchronize:
+      src: "{{ rsync_repo }}/{{ item }}"
+      dest: "{{ iso_root }}"
+      recursive: yes
+    with_items:
+      - 'images'
+      - 'LiveOS'
+      - 'Packages'
+  - name: Ensure .discinfo file exists in the ISO root
+    synchronize:
+      src: '{{ workspace }}/files/discinfo'
+      dest: '{{ iso_root }}/.discinfo'
+  - name: Ensure the chefdk RPM has been downloaded
+    get_url:
+      url: "https://packages.chef.io/files/stable/chefdk/1.4.3/el/7/chefdk-1.4.3-1.el7.x86_64.rpm"
+      dest: "{{ centiso_var }}/CustomRPMs/chefdk-1.4.3-1.el7.x86_64.rpm"
+      checksum: "sha256:bb70be05a6a99071d26ec288d338459fe71fdd6ab0e4cbb661ae66dfb6c82fc5"
+  - name: Ensure the chef-server-core RPM has been downloaded
+    get_url:
+      url: "https://packages.chef.io/files/stable/chef-server/12.15.8/el/7/chef-server-core-12.15.8-1.el7.x86_64.rpm"
+      dest: "{{ centiso_var }}/CustomRPMs/chef-server-core-12.15.8-1.el7.x86_64.rpm"
+      checksum: "sha256:a39b70bbbc8ba60d54c827d2a002f7b1d4f48629f8316ae59ae21ab2c73396d8"
+  - name: Ensure additional RPMs are copied from workspace share to the destination CustomRPMs directory
+    synchronize:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+    with_items:
+      - { src: '{{ centiso_var }}/CustomRPMs/', dest: '{{ iso_root }}/CustomRPMs/' }
+#  - name: Ensure the repodata has been updated
+#    command: "createrepo -g {{ build_root }}/mnt/repodata/d918936f5019be3fb66e9981a28cb2a41477a2963d741d454f79377a22214f43-c7-x86_64-comps.xml ."
+#    args:
+#      chdir: "{{ build_root }}/isolinux"
+  - name: Ensure the kickstart files have been copied to the new ISO directories
+    synchronize:
+      src: "{{ workspace }}/files/{{ item }}"
+      dest: "{{ iso_root }}/ks/{{ item }}"
+    with_items:
+      - ks.cfg
+      - workstation-ks.cfg
+  - name: Ensure isolinux.cfg is customized
+    synchronize:
+      src: "{{ workspace }}/files/isolinux.cfg"
+      dest: '{{ iso_root }}/isolinux/isolinux.cfg'
+  - name: Ensure a new ISO image is created from the destination directory
+    command: genisoimage -untranslated-filenames -V 'CentOS 7 x86_64' -J -joliet-long -rational-rock -translation-table -input-charset utf-8 -x ./lost+found -b isolinux/isolinux.bin -c boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -o "{{ centiso_var }}/CentOS-7-x86_64-Custom.iso" -T ./
+    args:
+      chdir: "{{ iso_root }}"
