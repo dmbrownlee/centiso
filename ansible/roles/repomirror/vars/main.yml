@@ -1,5 +1,5 @@
 ---
 docroot: /var/www/html
-mirror_base: http://mirror.centos.org/centos
+mirror_base:  rsync://centos.eecs.wsu.edu/centos
 release_major: 7
 release_full: 7.3.1611
