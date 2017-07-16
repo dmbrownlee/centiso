@@ -68,15 +68,16 @@
     - centosplus
     - extras
   become: yes
-#- name: Ensure repo is synced
-#  synchronize:
-#    dest: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/"
-#    src: "{{ mirror_base }}/{{ release_full }}/{{ item }}/x86_64/"
-#    rsync_opts:
-#      - "--exclude-from={{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/exclude.list"
-#  with_items:
-#    - os
-#    - isos
-#    - updates
-#    - centosplus
-#    - extras
+- name: Ensure local repo is synced with mirror
+  synchronize:
+    dest: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/"
+    src: "{{ mirror_base }}/{{ release_full }}/{{ item }}/x86_64/"
+    rsync_opts:
+      - "--exclude-from={{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/exclude.list"
+      - "--exclude=exclude.list"
+  with_items:
+    - os
+    - isos
+    - updates
+    - centosplus
+    - extras
