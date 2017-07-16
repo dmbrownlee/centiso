@@ -1,0 +1,5 @@
+---
+docroot: /var/www/html
+mirror_base: http://mirror.centos.org/centos
+release_major: 7
+release_full: 3.1611

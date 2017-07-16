@@ -4,29 +4,6 @@
     name: httpd
     state: present
   become: yes
-- name: Ensure top level directory for content exists
-  file:
-    path: /var/www/html/repos/centos/7.3.1611
-    state: directory
-  become: yes
-- name: Ensure repo subdirectories exists
-  file:
-    path: /var/www/html/repos/centos/7.3.1611/{{ item }}/x86_64
-    state: directory
-  with_items:
-    - os
-    - isos
-    - updates
-    - centosplus
-    - extras
-    - local
-  become: yes
-- name: Ensure release link exists
-  file:
-    path: /var/www/html/repos/centos/7
-    src: /var/www/html/repos/centos/7.3.1611
-    state: link
-  become: yes
 - name: Ensure firewall permits web traffic
   firewalld:
     service: http
@@ -41,33 +18,68 @@
     state: started
     enabled: yes
   become: yes
-- name: Ensure repo sync script is installed
-  copy:
-    dest: /usr/local/bin/syncrepos
-    src: syncrepos
-    owner: root
-    group: root
-    mode: 0750
-  become: yes
-- name: Ensure sync script excludes directory exists
+- name: Ensure top level directory for content exists
   file:
-    path: /etc/syncrepos/excludes
+    path: "{{ docroot }}/centos/{{ release_full }}"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
   become: yes
-- name: Ensure exclude lists are installed
-  copy:
-    dest: /etc/syncrepos/excludes/{{ item }}
-    src: "{{ item }}"
+- name: Ensure repo subdirectories exists
+  file:
+    path: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64"
+    state: directory
+  with_items:
+    - os
+    - isos
+    - updates
+    - centosplus
+    - extras
+    - local
+  become: yes
+- name: Ensure release link exists
+  file:
+    path: "{{ docroot }}/centos/{{ release_major }}"
+    src: "{{ docroot }}/centos/{{ release_full }}"
+    state: link
+  become: yes
+#- name: Ensure repo sync script is installed
+#  copy:
+#    dest: /usr/local/bin/syncrepos
+#    src: syncrepos
+#    owner: root
+#    group: root
+#    mode: 0750
+#  become: yes
+#- name: Ensure sync script excludes directory exists
+#  file:
+#    path: /etc/syncrepos/excludes
+#    state: directory
+#    owner: root
+#    group: root
+#    mode: 0755
+#  become: yes
+- name: Ensure exclude lists are installed before syncing
+  synchronize:
+    dest: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/exclude.list"
+    src: "{{ item }}.list"
     owner: root
     group: root
     mode: 0644
   with_items:
-    - os.list
-    - isos.list
-    - updates.list
-    - centosplus.list
-    - extras.list
+    - os
+    - isos
+    - updates
+    - centosplus
+    - extras
   become: yes
+#- name: Ensure repo is synced
+#  synchronize:
+#    dest: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/"
+#    src: "{{ mirror_base }}/{{ release_full }}/{{ item }}/x86_64/"
+#    rsync_opts:
+#      - "--exclude-from={{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/exclude.list"
+#  with_items:
+#    - os
+#    - isos
+#    - updates
+#    - centosplus
+#    - extras
