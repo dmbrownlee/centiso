@@ -1,0 +1,52 @@
+---
+- name: Ensure necessary packages are installed
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - tftp-server
+    - xinetd
+    - syslinux
+  become: yes
+- name: Ensure tftp is enabled in the xinetd configs
+  lineinfile:
+    path: /etc/xinetd.d/tftp
+    state: present
+    regexp: "^(	disable.*=.)yes$"
+    line: "\1no"
+  become: yes
+- name: Ensure directories for PXE content exit
+  file:
+    path: "{{ tftproot }}/pxelinux/pxelinux.cfg"
+    state: directory
+  become: yes
+- name: Ensure the pxelinux NBP and support files are installed
+  synchronize:
+    dest: "{{ tftproot }}/pxelinux/{{ item }}"
+    src: "/usr/share/syslinux/{{ item }}"
+  with_items:
+    - pxelinux.0
+    - menu.c32
+  become: yes
+- name: Ensure the kernel and initrd.img launched by pxelinux exist
+  synchronize:
+    dest: "{{ tftproot }}/{{ item }}"
+    src: "{{ rsync_mirror }}/{{ item }}"
+  with_items:
+    - vmlinuz
+    - initrd.img
+  become: yes
+- name: Ensure xinetd daemon is started and enabled at boot
+  systemd:
+    name: xinetd
+    state: started
+    enabled: yes
+  become: yes
+- name: Ensure firewall permits tftp traffic
+  firewalld:
+    service: tftp
+    zone: public
+    state: enabled
+    immediate: yes
+    permanent: yes
+  become: yes

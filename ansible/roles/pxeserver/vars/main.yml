@@ -1,0 +1,3 @@
+---
+rsync_mirror: rsync://centos.eecs.wsu.edu/centos
+tftproot: /var/lib/tftproot
