@@ -5,6 +5,9 @@
 - hosts: repomirror
   roles:
     - role: repomirror
+- hosts: pxeserver
+  roles:
+    - role: pxeserver
 - hosts: chefserver
   roles:
     - role: chefserver
