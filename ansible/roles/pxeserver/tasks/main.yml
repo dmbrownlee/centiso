@@ -58,7 +58,7 @@
   become: yes
 - name: Ensure xinetd and httpd are started and enabled at boot
   systemd:
-    name: {{ httpd }}
+    name: "{{ item }}"
     state: started
     enabled: yes
   with_items:
@@ -67,7 +67,7 @@
   become: yes
 - name: Ensure firewall permits tftp and http traffic
   firewalld:
-    service: {{ items }}
+    service: "{{ item }}"
     zone: public
     state: enabled
     immediate: yes
