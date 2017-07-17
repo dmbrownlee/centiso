@@ -3,3 +3,4 @@ rsync_mirror: rsync://centos.eecs.wsu.edu/centos
 release_full: 7.3.1611
 tftproot: /var/lib/tftpboot
 docroot: /var/www/html
+workspace: "{{ ansible_user_dir }}/centiso"

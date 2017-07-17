@@ -53,8 +53,11 @@
   become: yes
 - name: Ensure kickstart files are copy to the ks web directory
   synchronize:
-    dest: "{{ docroot }}/ks/"
-    src: "../../../../../files/*ks.cfg"
+    dest: "{{ docroot }}/ks/{{ item }}"
+    src: "{{ workspace }}/files/{{ item }}"
+  with_items:
+    - ks.cfg
+    - workstation-ks.cfg
   become: yes
 - name: Ensure xinetd and httpd are started and enabled at boot
   systemd:
