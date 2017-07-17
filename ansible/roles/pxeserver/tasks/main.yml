@@ -77,5 +77,5 @@
     permanent: yes
   with_items:
     - tftp
-    - httpd
+    - http
   become: yes
