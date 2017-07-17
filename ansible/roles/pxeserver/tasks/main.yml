@@ -71,7 +71,7 @@
 - name: Ensure firewall permits tftp and http traffic
   firewalld:
     service: "{{ item }}"
-    zone: public
+    zone: internal
     state: enabled
     immediate: yes
     permanent: yes
