@@ -7,6 +7,7 @@
     - tftp-server
     - xinetd
     - syslinux
+    - httpd
   become: yes
 - name: Ensure tftp is enabled in the xinetd configs
   lineinfile:
@@ -16,7 +17,7 @@
     line: '\1no'
     backrefs: yes
   become: yes
-- name: Ensure directories for PXE content exit
+- name: Ensure directories for PXE content exists
   file:
     path: "{{ tftproot }}/pxelinux/pxelinux.cfg"
     state: directory
@@ -45,17 +46,33 @@
     - vmlinuz
     - initrd.img
   become: yes
-- name: Ensure xinetd daemon is started and enabled at boot
+- name: Ensure directory for kickstart files exists
+  file:
+    path: "{{ docroot }}/ks"
+    state: directory
+  become: yes
+- name: Ensure kickstart files are copy to the ks web directory
+  synchronize:
+    dest: "{{ docroot }}/ks/"
+    src: "../../../../../files/*ks.cfg"
+  become: yes
+- name: Ensure xinetd and httpd are started and enabled at boot
   systemd:
-    name: xinetd
+    name: {{ httpd }}
     state: started
     enabled: yes
+  with_items:
+    - xientd
+    - httpd
   become: yes
-- name: Ensure firewall permits tftp traffic
+- name: Ensure firewall permits tftp and http traffic
   firewalld:
-    service: tftp
+    service: {{ items }}
     zone: public
     state: enabled
     immediate: yes
     permanent: yes
+  with_items:
+    - tftp
+    - httpd
   become: yes
