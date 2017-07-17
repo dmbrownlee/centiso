@@ -1,0 +1,13 @@
+---
+iface_int: eth0
+domain: example.com
+dhcp_range_bottom: 100
+dhcp_range_top: 200
+dhcp_range_mask: 255.255.255.0
+dhcp_lease_duration: 1h
+nameserver_address: 10.1.1.254
+pxeserver_address: 10.1.1.254
+gateway_address: 10.1.1.254
+broadcast_address: 10.1.1.255
+network_address: 10.1.1.0
+ntpserver_address: 0.0.0.0
