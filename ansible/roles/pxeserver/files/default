@@ -1,0 +1,31 @@
+# Boot the menu.c32 "kernel" directly to provide a menu
+default menu.c32
+prompt 0
+
+# Wait 10 seconds before booting "local" option
+TIMEOUT 100
+ONTIMEOUT local
+
+# Set the text for the menu screen
+MENU TITLE PXE Boot Main Menu
+MENU AUTOBOOT Booting from local system in # seconds
+
+# Move custom colors, etc. to a separate file to avoid clutter here
+MENU INCLUDE pxelinux.cfg/graphics.conf
+
+# The first option does a network installation
+LABEL 1
+	MENU LABEL Install CentOS 7 over the ^network
+	kernel vmlinuz
+	append initrd=initrd.img inst.repo=http://repo/centos/7/os/x86_64 inst.ks=http://repo/ks/ks.cfg ip=dhcp net.ifnames=0
+
+# The second option creates a rescue image
+LABEL 2
+	MENU LABEL Boot a ^rescue image over the ^network
+	kernel vmlinuz
+	append initrd=initrd.img inst.repo=http://repo/centos/7/os/x86_64 ip=dhcp rescue ip=dhcp net.ifnames=0
+
+# This option boots from the local system disk
+LABEL 3
+	MENU LABEL Boot from local system ^disk
+        LOCALBOOT 0
