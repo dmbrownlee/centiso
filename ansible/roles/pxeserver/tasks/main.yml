@@ -65,7 +65,7 @@
     state: started
     enabled: yes
   with_items:
-    - xientd
+    - xinetd
     - httpd
   become: yes
 - name: Ensure firewall permits tftp and http traffic
