@@ -1,8 +1,11 @@
 ---
 - name: Ensure necessary packages are installed
   yum:
-    name: dnsmasq
+    name: "{{ item }}"
     state: present
+  with_items:
+    - dnsmasq
+    - python-firewall
   become: yes
 - name: Ensure dnsmasq is configured
   template:
@@ -10,9 +13,23 @@
     src: dnsmasq.conf.js
     backup: yes
   become: yes
-- name: Ensure dnsmasq is enabled
+- name: Ensure firewalld and dnsmasq are started and enabled at boot
   service:
-    name: dnsmasq
+    name: "{{ item }}"
     state: started
     enabled: yes
+  with_items:
+    - dnsmasq
+    - firewalld
+  become: yes
+- name: Ensure internal dhcp and dns traffic is allowed
+  firewalld:
+    service: "{{ item.service }}"
+    state: enabled
+    permanent: yes
+    immediate: yes
+    zone: "{{ item.zone }}"
+  with_items:
+    - { zone: internal, service: dhcp }
+    - { zone: internal, service: dns }
   become: yes
