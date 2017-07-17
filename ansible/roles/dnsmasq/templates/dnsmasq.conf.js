@@ -15,7 +15,7 @@ dhcp-option=28,{{ broadcast_address }}
 #dhcp-option=42,{{ ntpserver_address }}
 
 # PXE Configuration
-dhcp-boot=pxelinux.0,pxeserver,{{ pxeserver_address }}
+dhcp-boot=pxelinux/pxelinux.0,pxeserver,{{ pxeserver_address }}
 
 # Example Static IP address reservations
 # dhcp-host=50:e5:49:cb:c4:84,{{ dhcp_range_bottom }}
