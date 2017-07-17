@@ -16,22 +16,22 @@
   nmcli:
     ifname: "{{ iface_int }}"
     type: ethernet
-    conn_name: "{{ iface_int }}"
+    conn_name: "System {{ iface_int }}"
     ip4: "{{ iface_int_address }}/{{ iface_int_prefix }}"
     state: present
     autoconnect: yes
   become: yes
 - name: Do not use IPv6
-  command: nmcli c mod {{ item }} ipv6.method ignore
+  command: nmcli c mod "System {{ item }}" ipv6.method ignore
   with_items:
     - "{{ iface_int }}"
     - "{{ iface_ext }}"
   become: yes
 - name: Use NetworkManager to configure zone for internal interface
-  command: nmcli c mod {{ iface_int }} connection.zone internal
+  command: nmcli c mod "System {{ iface_int }}" connection.zone internal
   become: yes
 - name: Use NetworkManager to configure zone for external interface
-  command: nmcli c mod {{ iface_ext }} connection.zone external
+  command: nmcli c mod "System {{ iface_ext }}" connection.zone external
   become: yes
 - name: Enable NetworkManager
   service:
