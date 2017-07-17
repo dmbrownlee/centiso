@@ -71,6 +71,7 @@
       dest: "{{ iso_root }}/ks/{{ item }}"
     with_items:
       - ks.cfg
+      - natgw-ks.cfg
       - workstation-ks.cfg
   - name: Ensure isolinux.cfg is customized
     synchronize:
