@@ -1,5 +1,5 @@
 ---
-iface_int: eth0
+iface_int: enp0s3
 iface_int_address: 10.1.1.254
 iface_int_prefix: 24
-iface_ext: eth1
+iface_ext: enp0s8

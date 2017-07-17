@@ -1,5 +1,5 @@
 ---
-iface_int: eth0
+iface_int: enp0s3
 domain: example.com
 dhcp_range_bottom: 100
 dhcp_range_top: 200
