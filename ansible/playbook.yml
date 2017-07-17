@@ -1,7 +1,7 @@
 ---
-- hosts: all
-  roles:
-    - role: use-local-repo
+#- hosts: all
+#  roles:
+#    - role: use-local-repo
 - hosts: natgw
   roles:
     - role: natgw
