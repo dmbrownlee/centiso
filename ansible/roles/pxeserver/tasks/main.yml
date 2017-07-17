@@ -59,6 +59,15 @@
     - ks.cfg
     - workstation-ks.cfg
   become: yes
+- name: Ensure the copied kickstart files install from the local repo
+  lineinfile:
+    path: "{{ docroot }}/ks/{{ item }}"
+    regexp: '^cdrom$'
+    line: 'url --url http://10.1.1.254/centos/7/os/x86_64'
+  with_items:
+    - ks.cfg
+    - workstation-ks.cfg
+  become: yes
 - name: Ensure xinetd and httpd are started and enabled at boot
   systemd:
     name: "{{ item }}"
