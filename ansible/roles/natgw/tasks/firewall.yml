@@ -1,0 +1,59 @@
+---
+- name: Ensure necessary packages are installed
+  yum: name={{ item }} state=present
+  become: yes
+  with_items:
+    - python-firewall
+- name: Ensure firewalld is started and enabled at boot
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+  become: yes
+- name: Ensure the default zome is internal
+  command: firewall-cmd --set-default-zone=internal
+  become: yes
+- name: Ensure unwanted firewall defaults are disabled
+  firewalld:
+    service: "{{ item.service }}"
+    state: disabled
+    permanent: yes
+    immediate: yes
+    zone: "{{ item.zone }}"
+  with_items:
+    - { zone: dmz, service: ssh }
+    - { zone: home, service: dhcpv6-client }
+    - { zone: home, service: mdns }
+    - { zone: home, service: samba-client }
+    - { zone: home, service: ssh }
+    - { zone: internal, service: samba-client }
+    - { zone: public, service: dhcpv6-client }
+    - { zone: public, service: ssh }
+    - { zone: work, service: dhcpv6-client }
+    - { zone: work, service: ssh }
+  become: yes
+- name: Ensure certain inbound traffic is allowed
+  firewalld:
+    service: "{{ item.service }}"
+    state: enabled
+    permanent: yes
+    immediate: yes
+    zone: "{{ item.zone }}"
+  with_items:
+    - { zone: external, service: ssh }
+    - { zone: internal, service: ssh }
+  become: yes
+#- name: Ensure outbound traffic is masqueraded
+#  command: firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -o {{ iface_ext }} -j MASQUERADE
+#  become: yes
+#- name: Ensure traffic from outside is forwarded if it is related to outbound traffic
+#  command: firewall-cmd --permanent --direct --add-rule ipv4 filter FORWARD 0 -i {{ iface_ext }} -o {{ iface_int }} -m state --state REALATED,ESTABLISHED -j ACCEPT
+#  become: yes
+#- name: Ensure traffic from inside is forwarded
+#  command: firewall-cmd --permanent --direct --add-rule ipv4 filter FORWARD 0 -i {{ iface_int }} -o {{ iface_ext }} -j ACCEPT
+#  become: yes
+- name: Enable routing between interfaces
+  lineinfile:
+    dest: /etc/sysctl.conf
+    line: net.ipv4.ip_forward = 1
+  become: yes

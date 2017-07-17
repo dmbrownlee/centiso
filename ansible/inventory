@@ -1,4 +1,5 @@
 localhost ansible_connection=local
+natgw ansible_connection=local
 repomirror ansible_connection=local
 pxeserver ansible_connection=local
 chefserver ansible_connection=local
