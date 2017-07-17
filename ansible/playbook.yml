@@ -5,6 +5,9 @@
 - hosts: natgw
   roles:
     - role: natgw
+- hosts: dnsmasq 
+  roles:
+    - role: dnsmasq
 - hosts: repomirror
   roles:
     - role: repomirror
