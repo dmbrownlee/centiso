@@ -17,19 +17,19 @@ MENU INCLUDE pxelinux.cfg/graphics.conf
 LABEL 1
 	MENU LABEL Install Generic ^Server (no GUI)
 	kernel vmlinuz
-	append initrd=initrd.img inst.repo=http://10.1.1.254/centos/7/os/x86_64 inst.ks=http://10.1.1.254/ks/ks.cfg ip=dhcp net.ifnames=0
+	append initrd=initrd.img inst.repo=http://10.1.1.254/centos/7/os/x86_64 inst.ks=http://10.1.1.254/ks/ks.cfg ip=dhcp
 
 # This option does a generic workstation install over the network
 LABEL 1
 	MENU LABEL Install Generic ^Workstation (GUI)
 	kernel vmlinuz
-	append initrd=initrd.img inst.repo=http://10.1.1.254/centos/7/os/x86_64 inst.ks=http://10.1.1.254/ks/workstation-ks.cfg ip=dhcp net.ifnames=0
+	append initrd=initrd.img inst.repo=http://10.1.1.254/centos/7/os/x86_64 inst.ks=http://10.1.1.254/ks/workstation-ks.cfg ip=dhcp
 
 # This option boots a rescue image over the network
 LABEL 2
 	MENU LABEL Boot a ^rescue image over the ^network
 	kernel vmlinuz
-	append initrd=initrd.img inst.repo=http://10.1.1.254/centos/7/os/x86_64 ip=dhcp rescue ip=dhcp net.ifnames=0
+	append initrd=initrd.img inst.repo=http://10.1.1.254/centos/7/os/x86_64 ip=dhcp rescue ip=dhcp
 
 # This option boots from the local system disk
 LABEL 3
