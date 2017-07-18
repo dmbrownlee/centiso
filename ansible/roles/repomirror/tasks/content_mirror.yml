@@ -1,0 +1,88 @@
+---
+- name: Ensure necessary packages are installed
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - httpd
+    - createrepo
+  become: yes
+- name: Ensure firewall permits web traffic
+  firewalld:
+    service: http
+    zone: public
+    state: enabled
+    immediate: yes
+    permanent: yes
+  become: yes
+- name: Ensure web service is started and enabled at boot
+  systemd:
+    name: httpd
+    state: started
+    enabled: yes
+  become: yes
+- name: Ensure top level directory for content exists
+  file:
+    path: "{{ docroot }}/centos/{{ release_full }}"
+    state: directory
+  become: yes
+- name: Ensure repo subdirectories exists
+  file:
+    path: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64"
+    state: directory
+  with_items:
+    - os
+    - isos
+    - updates
+    - centosplus
+    - extras
+    - local
+  become: yes
+- name: Ensure release link exists
+  file:
+    path: "{{ docroot }}/centos/{{ release_major }}"
+    src: "{{ docroot }}/centos/{{ release_full }}"
+    state: link
+  become: yes
+#- name: Ensure repo sync script is installed
+#  copy:
+#    dest: /usr/local/bin/syncrepos
+#    src: syncrepos
+#    owner: root
+#    group: root
+#    mode: 0750
+#  become: yes
+#- name: Ensure sync script excludes directory exists
+#  file:
+#    path: /etc/syncrepos/excludes
+#    state: directory
+#    owner: root
+#    group: root
+#    mode: 0755
+#  become: yes
+- name: Ensure exclude lists are installed before syncing
+  copy:
+    dest: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/exclude.list"
+    src: "{{ item }}.list"
+  with_items:
+    - os
+    - isos
+    - updates
+    - centosplus
+    - extras
+  become: yes
+- name: Ensure local repo is synced with mirror
+  synchronize:
+    mode: pull
+    dest: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/"
+    src: "{{ mirror_base }}/{{ release_full }}/{{ item }}/x86_64/"
+    rsync_opts:
+      - "--exclude-from={{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/exclude.list"
+      - "--exclude=exclude.list"
+  with_items:
+    - os
+    - isos
+    - updates
+    - centosplus
+    - extras
+  delegate_to: "{{ inventory_hostname }}"

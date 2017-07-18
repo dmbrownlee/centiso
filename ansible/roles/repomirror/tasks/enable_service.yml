@@ -1,0 +1,7 @@
+---
+- name: Ensure web service is started and enabled at boot
+  systemd:
+    name: httpd
+    state: started
+    enabled: yes
+  become: yes

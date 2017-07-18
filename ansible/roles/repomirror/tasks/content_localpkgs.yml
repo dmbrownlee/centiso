@@ -1,0 +1,23 @@
+---
+# Create localpkgs repo
+- name: Ensure directories for building the new ISO image exist
+  file:
+    path: "{{ localpkgs }}/Packages"
+    state: directory
+  become: yes
+- name: Ensure the chefdk RPM has been downloaded
+  get_url:
+    url: "https://packages.chef.io/files/stable/chefdk/1.4.3/el/7/chefdk-1.4.3-1.el7.x86_64.rpm"
+    dest: "{{ localpkgs }}/Packages/chefdk-1.4.3-1.el7.x86_64.rpm"
+    checksum: "sha256:bb70be05a6a99071d26ec288d338459fe71fdd6ab0e4cbb661ae66dfb6c82fc5"
+  become: yes
+- name: Ensure the chef-server-core RPM has been downloaded
+  get_url:
+    url: "https://packages.chef.io/files/stable/chef-server/12.15.8/el/7/chef-server-core-12.15.8-1.el7.x86_64.rpm"
+    dest: "{{ localpkgs }}/Packages/chef-server-core-12.15.8-1.el7.x86_64.rpm"
+    checksum: "sha256:a39b70bbbc8ba60d54c827d2a002f7b1d4f48629f8316ae59ae21ab2c73396d8"
+  become: yes
+#  - name: Ensure the repodata has been updated
+#    command: "createrepo -g {{ build_root }}/mnt/repodata/d918936f5019be3fb66e9981a28cb2a41477a2963d741d454f79377a22214f43-c7-x86_64-comps.xml ."
+#    args:
+#      chdir: "{{ build_root }}/isolinux"
