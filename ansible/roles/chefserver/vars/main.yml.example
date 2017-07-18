@@ -1,0 +1,11 @@
+---
+keydir: /etc/default/chefserver/keys
+# You need to edit these values before running the setup script tasks.
+# TODO: move this to ansible vault
+# chef_username: jdoe
+# chef_userfirst: J
+# chef_userlast: Doe
+# chef_useremail: jdoe@example.com
+# chef_userpass: 'pass1234'
+# chef_orgname: example
+# chef_orgdisplayname: 'Example Company'

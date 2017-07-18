@@ -1,7 +1,11 @@
 #!/bin/bash
 
-# This script quickly spins up the bare bones VMs we need to test the project
-# without the need for Vagrant, packer, and vagrant baseboxes.
+# Without arguments, this script quickly allocates the VMs we need to test the
+# project without the need for Vagrant, packer, and vagrant baseboxes.
+# Alternatively, you can use it to create additional VMs by passing arguments.
+# At a minimum, you need to specify a hostname.  The format is:
+#
+# ./vm.sh [hostname] [RAM MB] [DISK MB] [int|ext|both] [/path/to/iso] [MAC]
 
 function new-vm {
   HOST="$1"
@@ -46,7 +50,8 @@ function new-vm {
 if [[ -z "$1" ]]; then
   new-vm buildbox 2048 102400 ext "$HOME/Downloads/CentOS-7-x86_64-NetInstall-1611.iso"
   new-vm router 2048 102400 both emptydrive
-  new-vm chef 2048 102400 int emptydrive 0800276F9FE1
+  new-vm chefserver 2048 102400 int emptydrive 0800276F9FE1
+  new-vm workstation 2048 102400 int emptydrive
 else
   new-vm $@
 fi
