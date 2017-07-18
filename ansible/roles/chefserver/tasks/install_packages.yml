@@ -4,6 +4,3 @@
     name: chef-server-core
     state: present
   become: yes
-- name: Ensure reconfigure has been done at least once
-  command: chef-server-ctl reconfigure
-  become: yes
