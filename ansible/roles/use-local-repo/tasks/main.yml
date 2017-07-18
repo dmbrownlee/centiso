@@ -8,8 +8,8 @@
     name: chef-stable
     description: Chef stable repository - https://docs.chef.io/packages.html
     baseurl: https://packages.chef.io/repos/yum/stable/el/7/x86_64/
-    gpgcheck=1
-    enabled=1
+    gpgcheck: 1
+    enabled: 1
   become: yes
 - name: Ensure localpkgs repo has been added
   yum_repository:
