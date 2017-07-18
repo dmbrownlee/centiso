@@ -19,3 +19,4 @@ dhcp-boot=pxelinux/pxelinux.0,pxeserver,{{ pxeserver_address }}
 
 # Example Static IP address reservations
 # dhcp-host=50:e5:49:cb:c4:84,{{ dhcp_range_bottom }}
+dhcp-host=0800276F9FE1,chefserver,10.1.1.20
