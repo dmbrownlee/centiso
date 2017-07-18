@@ -9,6 +9,11 @@ function new-vm {
   DISKMB=${3:-102400}
   NIC=${4:-int}
   ISO=${5:-emptydrive}
+  MAC=${6}
+
+  if [[ -n $MAC ]]; then
+    MAC="--macaddress1 ${6}"
+  fi
 
   vboxmanage createvm --name "$HOST" --ostype "RedHat_64" --register
   vboxmanage storagectl "$HOST" --name "IDE" --add ide --controller "PIIX4" --portcount "2" --bootable "on"
@@ -25,7 +30,7 @@ function new-vm {
   vboxmanage storageattach "$HOST" --storagectl "SATA" --port 0 --device 0 --type "hdd" --medium "$HOME/VirtualBox VMs/$HOST/$HOST-disk001.vmdk"
   case $NIC in
     "int")
-      vboxmanage modifyvm "$HOST" --nic1 "intnet" --intnet1 "internal" --nicpromisc1 "allow-vms" --cableconnected1 "on"
+      vboxmanage modifyvm "$HOST" --nic1 "intnet" --intnet1 "internal" --nicpromisc1 "allow-vms" $MAC --cableconnected1 "on"
       ;;
     "ext")
       vboxmanage modifyvm "$HOST" --nic1 "nat" --nicpromisc1 "allow-vms" --cableconnected1 "on"
@@ -41,7 +46,7 @@ function new-vm {
 if [[ -z "$1" ]]; then
   new-vm buildbox 2048 102400 ext "$HOME/Downloads/CentOS-7-x86_64-NetInstall-1611.iso"
   new-vm router 2048 102400 both emptydrive
-  new-vm chef 2048 102400 int emptydrive
+  new-vm chef 2048 102400 int emptydrive 0800276F9FE1
 else
   new-vm $@
 fi
