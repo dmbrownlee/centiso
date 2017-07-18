@@ -17,7 +17,7 @@
     dest: "{{ localpkgs }}/Packages/chef-server-core-12.15.8-1.el7.x86_64.rpm"
     checksum: "sha256:a39b70bbbc8ba60d54c827d2a002f7b1d4f48629f8316ae59ae21ab2c73396d8"
   become: yes
- - name: Ensure the repodata has been updated
-   command: "createrepo ."
-   args:
-     chdir: "{{ localpkgs }}"
+- name: Ensure the repodata has been updated
+  command: "createrepo ."
+  args:
+    chdir: "{{ localpkgs }}"
