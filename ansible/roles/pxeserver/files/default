@@ -1,10 +1,12 @@
 # Boot the menu.c32 "kernel" directly to provide a menu
-default menu.c32
-prompt 0
+DEFAULT menu.c32
+PROMPT 0
 
-# Wait 10 seconds before booting "local" option
+# Wait 10 seconds before booting from the local disk.  It the user presses a
+# key to stop the timer, boot the local disk if no selection made in 5 minutes
 TIMEOUT 100
-ONTIMEOUT local
+TOTALTIMEOUT 3000
+ONTIMEOUT .localboot 0
 
 # Set the text for the menu screen
 MENU TITLE PXE Boot Main Menu
@@ -14,24 +16,25 @@ MENU AUTOBOOT Booting from local system in # seconds
 MENU INCLUDE pxelinux.cfg/graphics.conf
 
 # This option does a generic server install over the network
-LABEL 1
+LABEL server
 	MENU LABEL Install Generic ^Server (no GUI)
 	kernel vmlinuz
 	append initrd=initrd.img inst.repo=http://10.1.1.254/centos/7/os/x86_64 inst.ks=http://10.1.1.254/ks/ks.cfg ip=dhcp
 
 # This option does a generic workstation install over the network
-LABEL 1
+LABEL workstation
 	MENU LABEL Install Generic ^Workstation (GUI)
 	kernel vmlinuz
 	append initrd=initrd.img inst.repo=http://10.1.1.254/centos/7/os/x86_64 inst.ks=http://10.1.1.254/ks/workstation-ks.cfg ip=dhcp
 
 # This option boots a rescue image over the network
-LABEL 2
+LABEL rescue
 	MENU LABEL Boot a ^rescue image over the ^network
 	kernel vmlinuz
 	append initrd=initrd.img inst.repo=http://10.1.1.254/centos/7/os/x86_64 ip=dhcp rescue ip=dhcp
 
 # This option boots from the local system disk
-LABEL 3
+LABEL local
 	MENU LABEL Boot from local system ^disk
+        MENU DEFAULT
         LOCALBOOT 0
