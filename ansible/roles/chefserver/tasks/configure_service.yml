@@ -1,0 +1,58 @@
+---
+- name: Ensure we have a default place to store keys
+  file:
+    path: "{{ keydir }}"
+    owner: root
+    group: root
+    state: directory
+    mode: 0700
+  become: yes
+- name: Check for configured flag
+  stat:
+    path: "{{ keydir }}/.chefserver-configured"
+  register: lockfile
+- fail:
+    msg: "chef_username is not defined. Fix your roles/chefserver/vars/main.yml"
+  when: chef_username is not defined
+- name: Ensure chef-server-ctl reconfigure has been run at least once
+  command: chef-server-ctl reconfigure
+  when: lockfile.stat.exists is not defined
+  become: yes
+- name: Ensure initial user has been created
+  command: chef-server-ctl user-create {{ username }} {{ userfirst }} {{ userlast }} {{ useremail }} '{{ userpass }}' --filename {{ keydir }}/{{ username }}.pem
+  become: yes
+  when: lockfile.stat.exists is not defined
+- name: Ensure initial org has been created
+  command: chef-server-ctl org-create {{ orgname }} '{{ orgdisplayname }}' --association_user {{ username }} --filename {{ keydir }}/{{ orgname }}-validator.pem
+  become: yes
+  when: lockfile.stat.exists is not defined
+- name: Ensure chef-manage is installed
+  command: chef-server-ctl install chef-manage
+  become: yes
+  when: lockfile.stat.exists is not defined
+- name: Ensure chef-server-ctl reconfigure is run after installing new features
+  command: chef-server-ctl reconfigure
+  become: yes
+  when: lockfile.stat.exists is not defined
+- name: Ensure chef-manage-ctl reconfigure is run after installation
+  command: chef-manage-ctl reconfigure --accept-license
+  become: yes
+  when: lockfile.stat.exists is not defined
+- name: Ensure opscode-push-jobs-server is installed
+  command: chef-server-ctl install opscode-push-jobs-server
+  become: yes
+  when: lockfile.stat.exists is not defined
+- name: Ensure chef-server-ctl reconfigure is run after installing new features
+  command: chef-server-ctl reconfigure
+  become: yes
+  when: lockfile.stat.exists is not defined
+- name: Ensure chef-manage-ctl reconfigure is run after installation
+  command: opscode-push-jobs-server-ctl reconfigure
+  become: yes
+  when: lockfile.stat.exists is not defined
+- name: Ensure lockfile gets created
+  file:
+    path: "{{ keydir }}/.chefserver-configured"
+    state: present
+  become: yes
+  when: lockfile.stat.exists is not defined

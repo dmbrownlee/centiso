@@ -1,0 +1,12 @@
+---
+- name: Ensure firewall permits http traffic
+  firewalld:
+    service: "{{ item }}"
+    zone: internal
+    state: enabled
+    immediate: yes
+    permanent: yes
+  with_items:
+    - http
+    - https
+  become: yes
