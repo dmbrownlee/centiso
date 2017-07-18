@@ -1,5 +1,5 @@
 ---
-- Ensure localpkgs repo has been added
+- name: Ensure localpkgs repo has been added
   yum_repository:
     name: localpkgs
     description: Repository for custom site packages
