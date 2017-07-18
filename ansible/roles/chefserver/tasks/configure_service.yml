@@ -11,48 +11,73 @@
   stat:
     path: "{{ keydir }}/.chefserver-configured"
   register: lockfile
-- fail:
+- name: Fail if chef_username is not defined
+  fail:
     msg: "chef_username is not defined. Fix your roles/chefserver/vars/main.yml"
   when: chef_username is not defined
+- name: Fail if chef_userfirst is not defined
+  fail:
+    msg: "chef_userfirst is not defined. Fix your roles/chefserver/vars/main.yml"
+  when: chef_userfirst is not defined
+- name: Fail if chef_userlast is not defined
+  fail:
+    msg: "chef_userlast is not defined. Fix your roles/chefserver/vars/main.yml"
+  when: chef_userlast is not defined
+- name: Fail if chef_useremail is not defined
+  fail:
+    msg: "chef_useremail is not defined. Fix your roles/chefserver/vars/main.yml"
+  when: chef_useremail is not defined
+- name: Fail if chef_userpass is not defined
+  fail:
+    msg: "chef_userpass is not defined. Fix your roles/chefserver/vars/main.yml"
+  when: chef_userpass is not defined
+- name: Fail if chef_orgname is not defined
+  fail:
+    msg: "chef_orgname is not defined. Fix your roles/chefserver/vars/main.yml"
+  when: chef_orgname is not defined
+- name: Fail if chef_orgdisplayname is not defined
+  fail:
+    msg: "chef_orgdisplayname is not defined. Fix your roles/chefserver/vars/main.yml"
+  when: chef_orgdisplayname is not defined
 - name: Ensure chef-server-ctl reconfigure has been run at least once
   command: chef-server-ctl reconfigure
-  when: lockfile.stat.exists is not defined
+  when: lockfile.stat.exists is defined and not lockfile.stat.exists
   become: yes
 - name: Ensure initial user has been created
-  command: chef-server-ctl user-create {{ username }} {{ userfirst }} {{ userlast }} {{ useremail }} '{{ userpass }}' --filename {{ keydir }}/{{ username }}.pem
+  command: chef-server-ctl user-create {{ chef_username }} {{ chef_userfirst }} {{ chef_userlast }} {{ chef_useremail }} '{{ chef_userpass }}' --filename {{ keydir }}/{{ chef_username }}.pem
   become: yes
-  when: lockfile.stat.exists is not defined
+  when: lockfile.stat.exists is defined and not lockfile.stat.exists
 - name: Ensure initial org has been created
-  command: chef-server-ctl org-create {{ orgname }} '{{ orgdisplayname }}' --association_user {{ username }} --filename {{ keydir }}/{{ orgname }}-validator.pem
+  command: chef-server-ctl org-create {{ chef_orgname }} '{{ chef_orgdisplayname }}' --association_user {{ chef_username }} --filename {{ keydir }}/{{ chef_orgname }}-validator.pem
   become: yes
-  when: lockfile.stat.exists is not defined
+  when: lockfile.stat.exists is defined and not lockfile.stat.exists
 - name: Ensure chef-manage is installed
   command: chef-server-ctl install chef-manage
   become: yes
-  when: lockfile.stat.exists is not defined
+  when: lockfile.stat.exists is defined and not lockfile.stat.exists
 - name: Ensure chef-server-ctl reconfigure is run after installing new features
   command: chef-server-ctl reconfigure
   become: yes
-  when: lockfile.stat.exists is not defined
+  when: lockfile.stat.exists is defined and not lockfile.stat.exists
 - name: Ensure chef-manage-ctl reconfigure is run after installation
   command: chef-manage-ctl reconfigure --accept-license
   become: yes
-  when: lockfile.stat.exists is not defined
+  when: lockfile.stat.exists is defined and not lockfile.stat.exists
 - name: Ensure opscode-push-jobs-server is installed
   command: chef-server-ctl install opscode-push-jobs-server
   become: yes
-  when: lockfile.stat.exists is not defined
+  when: lockfile.stat.exists is defined and not lockfile.stat.exists
 - name: Ensure chef-server-ctl reconfigure is run after installing new features
   command: chef-server-ctl reconfigure
   become: yes
-  when: lockfile.stat.exists is not defined
+  when: lockfile.stat.exists is defined and not lockfile.stat.exists
 - name: Ensure chef-manage-ctl reconfigure is run after installation
   command: opscode-push-jobs-server-ctl reconfigure
   become: yes
-  when: lockfile.stat.exists is not defined
+  when: lockfile.stat.exists is defined and not lockfile.stat.exists
 - name: Ensure lockfile gets created
   file:
     path: "{{ keydir }}/.chefserver-configured"
-    state: present
+    state: touch
   become: yes
-  when: lockfile.stat.exists is not defined
+  when: lockfile.stat.exists is defined and not lockfile.stat.exists
