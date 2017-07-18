@@ -1,4 +1,16 @@
 ---
+- name: Ensure key for chef RPMs is installed
+  rpm_key:
+    key: https://packages.chef.io/chef.asc
+    state: present
+- name: Ensure chef-stable repo has been added
+  yum_repository:
+    name: chef-stable
+    description: Chef stable repository - https://docs.chef.io/packages.html
+    baseurl: https://packages.chef.io/repos/yum/stable/el/7/x86_64/
+    gpgcheck=1
+    enabled=1
+  become: yes
 - name: Ensure localpkgs repo has been added
   yum_repository:
     name: localpkgs
