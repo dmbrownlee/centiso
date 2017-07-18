@@ -2,21 +2,21 @@
 #- hosts: all
 #  roles:
 #    - role: use-local-repo
-- hosts: natgw
+
+- hosts:
+    - router.example.com
   roles:
     - role: natgw
-- hosts: dnsmasq 
-  roles:
     - role: dnsmasq
-- hosts: repomirror
-  roles:
     - role: repomirror
-- hosts: pxeserver
-  roles:
     - role: pxeserver
-- hosts: chefserver
+
+- hosts:
+    - chefserver.example.com
   roles:
     - role: chefserver
-- hosts: chefworkstation
+
+- hosts:
+    - buildbox.example.com
   roles:
     - role: chefworkstation

@@ -1,7 +1,8 @@
 localhost ansible_connection=local
-natgw ansible_connection=local
-dnsmasq ansible_connection=local
-repomirror ansible_connection=local
-pxeserver ansible_connection=local
-chefserver ansible_connection=local
-chefworkstation ansible_connection=local
+
+# These are the machines of example.com that will need ansible playbooks to
+# get started.  Once the chef server is up and running, we can manage machines
+# with that.
+buildbox.example.com
+router.example.com
+chefserver.example.com
