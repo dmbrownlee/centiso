@@ -19,7 +19,7 @@ Steps to setup a similar environment:
 ## Getting started
 Run the following in your home directory to clone this project:
 
-    `$ __git clone https://github.com/dmbrownlee/centiso.git__`
+    `$ **git clone https://github.com/dmbrownlee/centiso.git**`
 
 This will create `~/centiso` as a git working directory.  Next, run:
 
@@ -44,7 +44,7 @@ Then you could install Ansible and start writing a playbook to create your own c
 
 Let's create our custom ISO image now:
 1. Login to the buildbox as root
-2. `$ __cd ~/centiso/ansible && ansible-playbook tasks/bootstrap-build-iso.yml__`
+2. `$ **cd ~/centiso/ansible && ansible-playbook tasks/bootstrap-build-iso.yml**`
 
 This will create a custom ISO image you can use to install the router VM.  You will want to scp the custom ISO image to the host OS (enable remote login if you haven't already).
 
@@ -54,12 +54,12 @@ Router is the first machine that will be part of our infrastructure.  As it is a
 Let's install router using the custom ISO image we created
 
 1. "Insert" the ISO file in the router VM and boot it
-2. Choose "" from the install menu
+2. Choose "Gateway" from the install menu
 
 NOTE: The following should be built into the install but currently is not
 
 3. Login to router as root
-4. `$ __cd ~/centiso/ansible && ansible-playbook -i inventory --limit router playbook.yml__`
+4. `$ **cd ~/centiso/ansible && ansible-playbook -i inventory --limit router playbook.yml**`
 
 NOTE: The last step will take a while as it creates a local CentOS mirror on router.
 
