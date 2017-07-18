@@ -23,7 +23,7 @@
     state: directory
   become: yes
 - name: Ensure the pxelinux NBP and support files are installed
-  synchronize:
+  copy:
     dest: "{{ tftproot }}/pxelinux/{{ item }}"
     src: "/usr/share/syslinux/{{ item }}"
   with_items:
@@ -31,7 +31,7 @@
     - menu.c32
   become: yes
 - name: Ensure the default config and support files for pxelinux are installed
-  synchronize:
+  copy:
     dest: "{{ tftproot }}/pxelinux/pxelinux.cfg/{{ item }}"
     src: "{{ item }}"
   with_items:
@@ -45,6 +45,7 @@
   with_items:
     - vmlinuz
     - initrd.img
+  delegate_to: "{{ inventory_hostname }}"
   become: yes
 - name: Ensure directory for kickstart files exists
   file:
@@ -52,7 +53,7 @@
     state: directory
   become: yes
 - name: Ensure kickstart files are copy to the ks web directory
-  synchronize:
+  copy:
     dest: "{{ docroot }}/ks/{{ item }}"
     src: "{{ workspace }}/files/{{ item }}"
   with_items:

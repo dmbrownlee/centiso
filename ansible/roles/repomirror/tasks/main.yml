@@ -58,7 +58,7 @@
 #    mode: 0755
 #  become: yes
 - name: Ensure exclude lists are installed before syncing
-  synchronize:
+  copy:
     dest: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/exclude.list"
     src: "{{ item }}.list"
   with_items:
@@ -70,6 +70,7 @@
   become: yes
 - name: Ensure local repo is synced with mirror
   synchronize:
+    mode: pull
     dest: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/"
     src: "{{ mirror_base }}/{{ release_full }}/{{ item }}/x86_64/"
     rsync_opts:
@@ -81,3 +82,4 @@
     - updates
     - centosplus
     - extras
+  delegate_to: "{{ inventory_hostname }}"
