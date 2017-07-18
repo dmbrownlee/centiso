@@ -1,0 +1,53 @@
+---
+- name: Ensure directories for PXE content exists
+  file:
+    path: "{{ tftproot }}/pxelinux/pxelinux.cfg"
+    state: directory
+  become: yes
+- name: Ensure the pxelinux NBP and support files are installed
+  copy:
+    dest: "{{ tftproot }}/pxelinux/{{ item }}"
+    src: "/usr/share/syslinux/{{ item }}"
+  with_items:
+    - pxelinux.0
+    - menu.c32
+  become: yes
+- name: Ensure the default config and support files for pxelinux are installed
+  copy:
+    dest: "{{ tftproot }}/pxelinux/pxelinux.cfg/{{ item }}"
+    src: "{{ item }}"
+  with_items:
+    - default
+    - graphics.conf
+  become: yes
+- name: Ensure the kernel and initrd.img launched by pxelinux exist
+  synchronize:
+    dest: "{{ tftproot }}/pxelinux/{{ item }}"
+    src: "{{ rsync_mirror }}/{{ release_full }}/os/x86_64/isolinux/{{ item }}"
+  with_items:
+    - vmlinuz
+    - initrd.img
+  delegate_to: "{{ inventory_hostname }}"
+  become: yes
+- name: Ensure directory for kickstart files exists
+  file:
+    path: "{{ docroot }}/ks"
+    state: directory
+  become: yes
+- name: Ensure kickstart files are copy to the ks web directory
+  copy:
+    dest: "{{ docroot }}/ks/{{ item }}"
+    src: "{{ workspace }}/files/{{ item }}"
+  with_items:
+    - ks.cfg
+    - workstation-ks.cfg
+  become: yes
+- name: Ensure the copied kickstart files install from the local repo
+  lineinfile:
+    path: "{{ docroot }}/ks/{{ item }}"
+    regexp: '^cdrom$'
+    line: 'url --url http://10.1.1.254/centos/7/os/x86_64'
+  with_items:
+    - ks.cfg
+    - workstation-ks.cfg
+  become: yes

@@ -1,0 +1,12 @@
+---
+- name: Ensure firewall permits tftp and http traffic
+  firewalld:
+    service: "{{ item }}"
+    zone: internal
+    state: enabled
+    immediate: yes
+    permanent: yes
+  with_items:
+    - tftp
+    - http
+  become: yes
