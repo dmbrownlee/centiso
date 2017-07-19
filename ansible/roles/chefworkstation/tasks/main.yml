@@ -21,4 +21,6 @@
   lineinfile:
     path: "{{ ansible_user_dir }}/.bash_profile"
     line: 'PATH=$PATH:/opt/chefdk/embedded/bin'
-    insertbefore: '^export PATH' 
+    insertbefore: '^export PATH'
+- name: Ensure chefserver cert is trusted
+  shell: cd {{ ansible_user_dir }}/chef-repo && knife ssl fetch
