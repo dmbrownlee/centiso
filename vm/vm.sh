@@ -53,7 +53,7 @@ if [[ -z "$1" ]]; then
   new-vm router RedHat_64 2048 102400 both emptydrive
   new-vm chefserver RedHat_64 2048 102400 int emptydrive 0800276F9FE1
   new-vm workstation RedHat_64 2048 102400 int emptydrive
-  new-vm mdtserver Windows2012_64 2048 102400 int "$HOME/Downloads/en_windows_server_2012_r2_x64_dvd_2707946.iso"
+  new-vm mdtserver Windows2012_64 2048 102400 int emptydrive
 else
   new-vm $@
 fi
