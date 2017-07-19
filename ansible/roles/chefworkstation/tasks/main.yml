@@ -4,18 +4,22 @@
     name: chefdk
     state: present
   become: yes
-- name: Ensure chef-repo is configured
-  command: chef generate app chef-repo
+- name: Ensure {{ chef_repo }} is configured
+  command: chef generate app {{ chef_repo }}
   args:
     chdir: "{{ ansible_user_dir }}"
-    creates: "{{ ansible_user_dir }}/chef-repo"
+    creates: "{{ ansible_user_dir }}/{{ chef_repo }}"
+- name: Ensure configuration directory is not checked into git
+  lineinfile:
+    path: "{{ ansible_user_dir }}/{{ chef_repo }}/.gitignore"
+    line: '.chef'
 - name: Ensure configuration directory exists
   file:
-    path: "{{ ansible_user_dir }}/chef-repo/.chef"
+    path: "{{ ansible_user_dir }}/{{ chef_repo }}/.chef"
     state: directory
 - name: Ensure knife.rb is configured
   template:
-    dest: "{{ ansible_user_dir }}/chef-repo/.chef/knife.rb"
+    dest: "{{ ansible_user_dir }}/{{ chef_repo }}/.chef/knife.rb"
     src: knife.rb.js
 - name: Ensure chekdk bin directory is in the path
   lineinfile:
@@ -23,4 +27,4 @@
     line: 'PATH=$PATH:/opt/chefdk/embedded/bin'
     insertbefore: '^export PATH'
 - name: Ensure chefserver cert is trusted
-  shell: cd {{ ansible_user_dir }}/chef-repo && knife ssl fetch
+  shell: cd {{ ansible_user_dir }}/{{ chef_repo }} && knife ssl fetch
