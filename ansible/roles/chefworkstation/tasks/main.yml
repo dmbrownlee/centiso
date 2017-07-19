@@ -4,6 +4,18 @@
     name: chefdk
     state: present
   become: yes
+- name: Check for playbook vars file
+  stat:
+    path: "{{ ansible_user_dir }}/centiso/ansible/roles/chefworkstation/vars/main.yml"
+  register: varsfile
+- name: Ensure this playbook has been configured
+  fail:
+    msg: "You need to copy roles/chefworkstation/vars/main.yml.example to roles/chefworkstation/vars/main.yml and edit the values for your specific site."
+  when: varsfile is defined and not varsfile.stat.exists
+- name: Ensure this chef_repo is defined
+  fail:
+    msg: "chef_repo needs to be configured in roles/chefworkstation/vars/main.yml."
+  when: varsfile is defined and chef_repo is not defined
 - name: Ensure {{ chef_repo }} is configured
   command: chef generate app {{ chef_repo }}
   args:
