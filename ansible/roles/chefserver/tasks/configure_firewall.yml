@@ -2,7 +2,7 @@
 - name: Ensure firewall permits http traffic
   firewalld:
     service: "{{ item }}"
-    zone: internal
+    zone: public
     state: enabled
     immediate: yes
     permanent: yes
