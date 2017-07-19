@@ -16,6 +16,6 @@
     - { role: chefserver, tags: chefserver }
 
 - hosts:
-    - buildbox.example.com
+    - chefworkstation.example.com
   roles:
     - { role: chefworkstation, tags: chefworkstation }

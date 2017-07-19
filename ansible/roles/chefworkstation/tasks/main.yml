@@ -1,6 +1,24 @@
----                                                                              
-- name: Ensure chefdk package is installed                                  
-  yum:                                                                           
+---
+- name: Ensure chefdk package is installed
+  yum:
     name: chefdk
-    state: present                                                               
+    state: present
   become: yes
+- name: Ensure chef-repo is configured
+  command: chef generate app chef-repo
+  args:
+    chdir: "{{ ansible_user_dir }}"
+    creates: "{{ ansible_user_dir }}/chef-repo"
+- name: Ensure configuration directory exists
+  file:
+    path: "{{ ansible_user_dir }}/chef-repo/.chef"
+    state: directory
+- name: Ensure knife.rb is configured
+  template:
+    dest: "{{ ansible_user_dir }}/chef-repo/.chef/knife.rb"
+    src: knife.rb.js
+- name: Ensure chekdk bin directory is in the path
+  lineinfile:
+    path: "{{ ansible_user_dir }}/.bash_profile"
+    line: 'PATH=$PATH:/opt/chefdk/embedded/bin'
+    insertbefore: '^export PATH' 

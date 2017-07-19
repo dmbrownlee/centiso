@@ -6,3 +6,4 @@ localhost ansible_connection=local
 buildbox.example.com
 router.example.com
 chefserver.example.com
+chefworkstation.example.com ansible_connection=local

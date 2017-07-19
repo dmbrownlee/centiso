@@ -3,3 +3,4 @@
 *.swp
 *.test
 ansible/roles/chefserver/vars/main.yml
+ansible/roles/chefworkstation/vars/main.yml
