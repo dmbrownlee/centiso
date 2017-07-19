@@ -40,3 +40,5 @@
     insertbefore: '^export PATH'
 - name: Ensure chefserver cert is trusted
   shell: cd {{ ansible_user_dir }}/{{ chef_repo }} && knife ssl fetch
+  args:
+    creates: "{{ ansible_user_dir }}/{{ chef_repo }}/.chef/trusted_certs/{{ chefserver_crt }}"
