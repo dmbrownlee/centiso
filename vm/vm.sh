@@ -9,17 +9,18 @@
 
 function new-vm {
   HOST="$1"
-  RAM=${2:-2048}
-  DISKMB=${3:-102400}
-  NIC=${4:-int}
-  ISO=${5:-emptydrive}
-  MAC=${6}
+  OSTYPE=$2
+  RAM=${3:-2048}
+  DISKMB=${4:-102400}
+  NIC=${5:-int}
+  ISO=${6:-emptydrive}
+  MAC=${7}
 
   if [[ -n $MAC ]]; then
-    MAC="--macaddress1 ${6}"
+    MAC="--macaddress1 ${MAC}"
   fi
 
-  vboxmanage createvm --name "$HOST" --ostype "RedHat_64" --register
+  vboxmanage createvm --name "$HOST" --ostype "$OSTYPE" --register
   vboxmanage storagectl "$HOST" --name "IDE" --add ide --controller "PIIX4" --portcount "2" --bootable "on"
   vboxmanage storagectl "$HOST" --name "SATA" --add sata --controller "IntelAhci" --portcount "30" --bootable "on"
   vboxmanage modifyvm "$HOST" --memory $RAM
@@ -29,7 +30,7 @@ function new-vm {
   vboxmanage modifyvm "$HOST" --boot3 "none"
   vboxmanage modifyvm "$HOST" --boot4 "none"
   vboxmanage modifyvm "$HOST" --rtcuseutc "on"
-  vboxmanage createmedium disk --filename "$HOME/VirtualBox VMs/$HOST/$HOST-disk001.vmdk" --size $DISKMB --format "VMDK"
+  vboxmanage createhd --filename "$HOME/VirtualBox VMs/$HOST/$HOST-disk001.vmdk" --size $DISKMB --format "VMDK"
   vboxmanage storageattach "$HOST" --storagectl "IDE" --port 0 --device 0 --type "dvddrive" --medium "$ISO"
   vboxmanage storageattach "$HOST" --storagectl "SATA" --port 0 --device 0 --type "hdd" --medium "$HOME/VirtualBox VMs/$HOST/$HOST-disk001.vmdk"
   case $NIC in
@@ -48,10 +49,11 @@ function new-vm {
 }
 
 if [[ -z "$1" ]]; then
-  new-vm buildbox 2048 102400 ext "$HOME/Downloads/CentOS-7-x86_64-NetInstall-1611.iso"
-  new-vm router 2048 102400 both emptydrive
-  new-vm chefserver 2048 102400 int emptydrive 0800276F9FE1
-  new-vm workstation 2048 102400 int emptydrive
+  new-vm buildbox RedHat_64 2048 102400 ext "$HOME/Downloads/CentOS-7-x86_64-NetInstall-1611.iso"
+  new-vm router RedHat_64 2048 102400 both emptydrive
+  new-vm chefserver RedHat_64 2048 102400 int emptydrive 0800276F9FE1
+  new-vm workstation RedHat_64 2048 102400 int emptydrive
+  new-vm mdtserver Windows2012_64 2048 102400 int "$HOME/Downloads/en_windows_server_2012_r2_x64_dvd_2707946.iso"
 else
   new-vm $@
 fi
