@@ -2,3 +2,4 @@
 chef_repo: it-support
 chef_username: jdoe
 chef_orgname: example
+chefserver_crt: chefserver_example_com.crt
