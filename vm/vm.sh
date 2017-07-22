@@ -21,10 +21,10 @@ function new-vm {
   fi
 
   # We only care about MAC on internal interfaces
-  NICINT1='--nic1 "intnet" --intnet1 "internal" --nicpromisc1 "allow-vms" --cableconnected1 "on" --nictype1="82540EM"'
+  NICINT1='--nic1 intnet --intnet1 internal --nicpromisc1 allow-vms --cableconnected1 on --nictype1=82540EM'
   NICINT1="$NICINT1 $MAC"
-  NICEXT1='--nic1 "nat" --nicpromisc1 "allow-vms" --cableconnected1 "on" --nictype1="82540EM"'
-  NICEXT2='--nic2 "nat" --nicpromisc2 "allow-vms" --cableconnected2 "on" --nictype2="82540EM"'
+  NICEXT1='--nic1 nat --nicpromisc1 allow-vms --cableconnected1 on --nictype1=82540EM'
+  NICEXT2='--nic2 nat --nicpromisc2 allow-vms --cableconnected2 on --nictype2=82540EM'
 
   echo "=== $OS ==="
   vboxmanage createvm --name "$HOST" --ostype "$OS" --register
