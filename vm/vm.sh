@@ -9,7 +9,7 @@
 
 function new-vm {
   HOST="$1"
-  OSTYPE=$2
+  OS="${2:-RedHat_64}"
   RAM=${3:-2048}
   DISKMB=${4:-102400}
   NIC=${5:-int}
@@ -20,7 +20,13 @@ function new-vm {
     MAC="--macaddress1 ${MAC}"
   fi
 
-  vboxmanage createvm --name "$HOST" --ostype "$OSTYPE" --register
+  # We only care about MAC on internal interfaces
+  NICINT1='--nic1 "intnet" --intnet1 "internal" --nicpromisc1 "allow-vms" --cableconnected1 "on" --nictype1="82540EM"'
+  NICINT1="$NICINT1 $MAC"
+  NICEXT1='--nic1 "nat" --nicpromisc1 "allow-vms" --cableconnected1 "on" --nictype1="82540EM"'
+  NICEXT2='--nic2 "nat" --nicpromisc2 "allow-vms" --cableconnected2 "on" --nictype2="82540EM"'
+
+  vboxmanage createvm --name "$HOST" --ostype "$OS" --register
   vboxmanage storagectl "$HOST" --name "IDE" --add ide --controller "PIIX4" --portcount "2" --bootable "on"
   vboxmanage storagectl "$HOST" --name "SATA" --add sata --controller "IntelAhci" --portcount "30" --bootable "on"
   vboxmanage modifyvm "$HOST" --memory $RAM
@@ -35,15 +41,15 @@ function new-vm {
   vboxmanage storageattach "$HOST" --storagectl "SATA" --port 0 --device 0 --type "hdd" --medium "$HOME/VirtualBox VMs/$HOST/$HOST-disk001.vmdk"
   case $NIC in
     "int")
-      vboxmanage modifyvm "$HOST" --nic1 "intnet" --intnet1 "internal" --nicpromisc1 "allow-vms" $MAC --cableconnected1 "on"
+      vboxmanage modifyvm "$HOST" $NICINT1
       ;;
     "ext")
-      vboxmanage modifyvm "$HOST" --nic1 "nat" --nicpromisc1 "allow-vms" --cableconnected1 "on"
+      vboxmanage modifyvm "$HOST" $NICEXT1
       ;;
     "both")
       # When you have both interfaces, the first is internal
-      vboxmanage modifyvm "$HOST" --nic1 "intnet" --intnet1 "internal" --nicpromisc1 "allow-all" --cableconnected1 "on"
-      vboxmanage modifyvm "$HOST" --nic2 "nat" --nicpromisc2 "allow-vms" --cableconnected2 "on"
+      vboxmanage modifyvm "$HOST" $NICINT1
+      vboxmanage modifyvm "$HOST" $NICEXT2
       ;;
   esac
 }
