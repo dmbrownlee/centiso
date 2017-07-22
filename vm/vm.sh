@@ -16,6 +16,18 @@ function new-vm {
   ISO=${6:-emptydrive}
   MAC=${7}
 
+  if [[ -z $MAC ]]; then
+    if [[ $HOST == "dns1" ]]; then MAC=080027000001; fi
+    if [[ $HOST == "dhcp1" ]]; then MAC=080027000002; fi
+    if [[ $HOST == "host03" ]]; then MAC=080027000003; fi
+    if [[ $HOST == "host04" ]]; then MAC=080027000004; fi
+    if [[ $HOST == "host05" ]]; then MAC=080027000005; fi
+    if [[ $HOST == "web1" ]]; then MAC=080027000010; fi
+    if [[ $HOST == "web2" ]]; then MAC=080027000011; fi
+    if [[ $HOST == "web3" ]]; then MAC=080027000012; fi
+    if [[ $HOST == "web4" ]]; then MAC=080027000013; fi
+  fi
+
   if [[ -n $MAC ]]; then
     MAC="--macaddress1 ${MAC}"
   fi
