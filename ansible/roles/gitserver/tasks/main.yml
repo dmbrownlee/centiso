@@ -1,0 +1,5 @@
+---
+- include: install_packages.yml
+- include: configure_service.yml
+- include: enable_service.yml
+- include: configure_firewall.yml

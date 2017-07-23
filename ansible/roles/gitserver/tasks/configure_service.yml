@@ -1,0 +1,49 @@
+---
+- name: Ensure git-shell exists in /etc/shells
+  lineinfile:
+    line: /bin/git-shell
+    path: /etc/shells
+  become: yes
+- name: Ensure git user exists
+  user:
+    name: git
+    state: present
+    shell: /bin/git-shell
+    home: /var/www/git
+    createhome: no
+  become: yes
+- name: Ensure the it-support.git directory exists
+  file:
+    path: /var/www/git/it-support.git
+    state: directory
+    owner: apache
+    group: apache
+    mode: '0775'
+  become: yes
+- name: Ensure it-support.git is a bare repository
+  command: git init --bare .
+  args:
+    chdir: /var/www/git/it-support.git
+    creates: /var/www/git/it-support.git/config
+  become: yes
+  become_user: apache
+- name: Ensure http support is enabled in the repository
+  lineinfile:
+    path: /var/www/git/it-support.git/config
+    line: '[http]'
+  become: yes
+- lineinfile:
+    path: /var/www/git/it-support.git/config
+    line: '        receivepack = true'
+    insertafter: '^[http]$'
+  become: yes
+- name: Ensure git-http-backend support is configured in Apache
+  copy:
+    src: git.conf
+    dest: /etc/httpd/conf.d/git.conf
+  become: yes
+  notify: httpd_restart
+- name: Ensure SE Linux is set to permissive (until I learn a better way)
+  selinux:
+    policy: targeted
+    state: permissive

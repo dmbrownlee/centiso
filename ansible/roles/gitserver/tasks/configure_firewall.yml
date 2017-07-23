@@ -1,0 +1,12 @@
+---
+- name: Ensure firewall permits ssh and http traffic
+  firewalld:
+    service: "{{ item }}"
+    zone: internal
+    state: enabled
+    immediate: yes
+    permanent: yes
+  with_items:
+    - ssh
+    - http
+  become: yes

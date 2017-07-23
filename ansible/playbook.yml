@@ -9,6 +9,7 @@
     - { role: dnsmasq, tags: dnsmasq }
     - { role: repomirror, tags: repomirror }
     - { role: pxeserver, tags: pxeserver }
+    - { role: gitserver, tags: gitserver }
 
 - hosts:
     - chefserver.example.com

@@ -1,0 +1,33 @@
+---
+- name: Ensure necessary packages are installed
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - git
+    - httpd
+  become: yes
+- name: Ensure git-shell exists in /etc/shells
+  lineinfile:
+    line: /bin/git-shell
+    path: /etc/shells
+  become: yes
+- name: Ensure git user exists
+  user:
+    name: git
+    state: present
+    shell: /bin/git-shell
+    home: /var/www/git
+  become: yes
+- name: Ensure it-support exists as a bare repository
+  file:
+    path: /var/git/it-support.git
+    state: directory
+  become: yes
+- command: git init --bare .
+  args:
+    chdir: /var/git/it-support.git
+    creates: /var/git/it-support.git/config
+
+
+
