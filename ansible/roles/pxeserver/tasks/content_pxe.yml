@@ -8,6 +8,7 @@
   copy:
     dest: "{{ tftproot }}/pxelinux/{{ item }}"
     src: "/usr/share/syslinux/{{ item }}"
+    remote_src: true
   with_items:
     - pxelinux.0
     - menu.c32
