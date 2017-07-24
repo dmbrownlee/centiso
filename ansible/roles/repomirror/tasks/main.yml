@@ -1,6 +1,6 @@
 ---
 - include: install_packages.yml
-- include: content_localpkgs.yml
 - include: content_mirror.yml
+- include: content_localpkgs.yml
 - include: enable_service.yml
 - include: configure_firewall.yml
