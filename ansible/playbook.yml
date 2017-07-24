@@ -1,7 +1,4 @@
 ---
-- hosts: all
-  roles:
-    - role: use-local-repo
 - hosts:
     - router.example.com
   roles:
@@ -10,6 +7,10 @@
     - { role: repomirror, tags: repomirror }
     - { role: pxeserver, tags: pxeserver }
     - { role: gitserver, tags: gitserver }
+
+- hosts: all
+  roles:
+    - role: use-local-repo
 
 - hosts:
     - chefserver.example.com
