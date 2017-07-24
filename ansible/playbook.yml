@@ -4,9 +4,9 @@
   roles:
     - { role: natgw, tags: natgw }
     - { role: dnsmasq, tags: dnsmasq }
-    - { role: repomirror, tags: repomirror }
     - { role: pxeserver, tags: pxeserver }
     - { role: gitserver, tags: gitserver }
+    - { role: repomirror, tags: repomirror }
 
 - hosts: all
   roles:
