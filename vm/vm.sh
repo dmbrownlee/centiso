@@ -67,12 +67,47 @@ function new-vm {
   esac
 }
 
-if [[ -z "$1" ]]; then
-  new-vm buildbox RedHat_64 2048 102400 ext "$HOME/Downloads/CentOS-7-x86_64-NetInstall-1611.iso"
-  new-vm router RedHat_64 2048 102400 both emptydrive
-  new-vm chefserver RedHat_64 2048 102400 int emptydrive 0800276F9FE1
-  new-vm workstation RedHat_64 2048 102400 int emptydrive
-  new-vm mdtserver Windows2012_64 2048 102400 int emptydrive
-else
-  new-vm $@
-fi
+case $HOST in
+  "buildbox")
+    new-vm buildbox RedHat_64 2048 102400 ext "$HOME/Downloads/CentOS-7-x86_64-NetInstall-1611.iso"
+    ;;
+  "router")
+    new-vm router RedHat_64 2048 102400 both emptydrive
+    ;;
+  "repomirror")
+    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000006
+    ;;
+  "dns1")
+    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000001
+    ;;
+  "dhcp1")
+    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000002
+    ;;
+  "dhcp2")
+    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000003
+    ;;
+  "chefserver")
+    new-vm chefserver RedHat_64 2048 102400 int emptydrive 0800276F9FE1
+    ;;
+  "workstation")
+    new-vm workstation RedHat_64 2048 102400 int emptydrive
+    ;;
+  "mdtserver")
+    new-vm mdtserver Windows2012_64 2048 102400 int emptydrive
+    ;;
+  "web1")
+    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000010
+    ;;
+  "web2")
+    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000011
+    ;;
+  "web3")
+    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000012
+    ;;
+  "web4")
+    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000013
+    ;;
+  *)
+    new-vm $@
+    ;;
+esac
