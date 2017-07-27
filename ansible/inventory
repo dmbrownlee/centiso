@@ -3,8 +3,20 @@ localhost ansible_connection=local
 # These are the machines of example.com that will need ansible playbooks to
 # get started.  Once the chef server is up and running, we can manage machines
 # with that.
-buildbox.example.com
+[router]
 router.example.com
+
+[repomirror]
 repomirror.example.com
+
+[chefserver]
 chefserver.example.com
-chefworkstation.example.com ansible_connection=local
+
+[chefworkstation]
+workstation.example.com
+
+[dnsserver]
+dns1.example.com
+
+[dhcpserver]
+dhcp1.example.com

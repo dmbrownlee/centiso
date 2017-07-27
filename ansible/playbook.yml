@@ -3,8 +3,7 @@
   roles:
     - { role: all-pre-configuration, tags: all-pre-configuration }
 
-- hosts:
-    - router.example.com
+- hosts: router
   roles:
     - { role: natgw, tags: natgw }
     - { role: dnsmasq, tags: dnsmasq }
@@ -15,16 +14,23 @@
   roles:
     - { role: repomirror, tags: repomirror }
 
+- hosts: chefserver
+  roles:
+    - { role: chefserver, tags: chefserver }
+
+- hosts: chefworkstation
+  roles:
+    - { role: chefworkstation, tags: chefworkstation }
+
+- hosts: dnsserver
+  roles:
+    - { role: dnsserver, tags: dnsserver }
+
+- hosts: dhcpserver
+  roles:
+    - { role: dhcpserver, tags: dhcpserver }
+
 - hosts: all
   roles:
     - role: use-local-repo
 
-- hosts:
-    - chefserver.example.com
-  roles:
-    - { role: chefserver, tags: chefserver }
-
-- hosts:
-    - chefworkstation.example.com
-  roles:
-    - { role: chefworkstation, tags: chefworkstation }
