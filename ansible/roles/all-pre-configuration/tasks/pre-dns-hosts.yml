@@ -5,7 +5,7 @@
     line: "{{ item }}"
   become: yes
   with_items:
-    - "10.1.1.254 router.example.com router pxeserver.example.com pxeserver
+    - "10.1.1.254 router.example.com router pxeserver.example.com pxeserver"
     - "10.1.1.1 dns1.example.com dns1"
     - "10.1.1.2 dhcp1.example.com dhcp1"
     - "10.1.1.6 repomirror.example.com repomirror"
