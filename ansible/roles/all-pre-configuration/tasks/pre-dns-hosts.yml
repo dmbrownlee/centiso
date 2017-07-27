@@ -7,16 +7,5 @@
   with_items:
     - "10.1.1.254 router.example.com router pxeserver.example.com pxeserver repomirror.example.com repomirror"
     - "10.1.1.1 dns1.example.com dns1"
-    - "10.1.1.2 dhcp1.example.com dhcp1
-
-if [[ -z "$1" ]]; then
-  new-vm buildbox RedHat_64 2048 102400 ext "$HOME/Downloads/CentOS-7-x86_64-NetInstall-1611.iso"
-  new-vm router RedHat_64 2048 102400 both emptydrive
-  new-vm repo RedHat_64 2048 102400 both emptydrive
-  new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000002
-  new-vm chefserver RedHat_64 2048 102400 int emptydrive 0800276F9FE1
-  new-vm workstation RedHat_64 2048 102400 int emptydrive
-  new-vm mdtserver Windows2012_64 2048 102400 int emptydrive
-else
-  new-vm $@
-fi
+    - "10.1.1.2 dhcp1.example.com dhcp1"
+    - "10.1.1.6 repomirror.example.com repomirror"

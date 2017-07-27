@@ -5,5 +5,6 @@ localhost ansible_connection=local
 # with that.
 buildbox.example.com
 router.example.com
+repomirror.example.com
 chefserver.example.com
 chefworkstation.example.com ansible_connection=local
