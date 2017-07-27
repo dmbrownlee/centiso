@@ -1,26 +1,4 @@
 ---
-- name: Ensure necessary packages are installed
-  yum:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - httpd
-    - createrepo
-  become: yes
-- name: Ensure firewall permits web traffic
-  firewalld:
-    service: http
-    zone: public
-    state: enabled
-    immediate: yes
-    permanent: yes
-  become: yes
-- name: Ensure web service is started and enabled at boot
-  systemd:
-    name: httpd
-    state: started
-    enabled: yes
-  become: yes
 - name: Ensure top level directory for content exists
   file:
     path: "{{ docroot }}/centos/{{ release_full }}"

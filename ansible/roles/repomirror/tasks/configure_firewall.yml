@@ -2,7 +2,7 @@
 - name: Ensure firewall permits web traffic
   firewalld:
     service: http
-    zone: public
+    zone: internal
     state: enabled
     immediate: yes
     permanent: yes
