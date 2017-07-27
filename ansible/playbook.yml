@@ -1,4 +1,8 @@
 ---
+- hosts: all
+  roles:
+    - { role: all-pre-configuration, tags: all-pre-configuration }
+
 - hosts:
     - router.example.com
   roles:
@@ -6,6 +10,9 @@
     - { role: dnsmasq, tags: dnsmasq }
     - { role: pxeserver, tags: pxeserver }
     - { role: gitserver, tags: gitserver }
+
+- hosts: repomirror
+  roles:
     - { role: repomirror, tags: repomirror }
 
 - hosts: all
