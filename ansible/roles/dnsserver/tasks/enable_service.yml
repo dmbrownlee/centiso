@@ -1,0 +1,9 @@
+---
+- name: Ensure service is enabled and configured to boot at startup (dns)
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - named
+  become: yes

@@ -1,0 +1,8 @@
+---
+- name: Ensure the dhcpd.cfg is copied
+  copy:
+    dest: "/etc/dhcpd/{{ item }}"
+    src: "{{ item }}"
+  with_items:
+    - dhcpd.conf
+  become: yes

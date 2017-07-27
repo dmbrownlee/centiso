@@ -1,0 +1,15 @@
+---
+- name: Ensure service configuration files are up to date
+  copy:
+    dest: "/etc/named.conf"
+    src: "{{ item }}"
+  with_items:
+    - named.conf
+  become: yes
+- name: Ensure zone files are up to date
+  template:
+    dest: "/etc/named.c/{{ item }}"
+    src: "{{ item }}"
+  with_items:
+    - 
+  become: yes

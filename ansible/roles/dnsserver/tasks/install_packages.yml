@@ -1,0 +1,9 @@
+---
+- name: Ensure necessary packages are installed
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - bind
+    - bind-utils
+  become: yes

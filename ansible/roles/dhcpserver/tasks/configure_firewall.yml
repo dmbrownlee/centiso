@@ -1,0 +1,45 @@
+---
+- name: Ensure necessary packages are installed
+  yum: name={{ item }} state=present
+  become: yes
+  with_items:
+    - python-firewall
+- name: Ensure firewalld is started and enabled at boot
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+  become: yes
+- name: Ensure the default zome is internal
+  command: firewall-cmd --set-default-zone=internal
+  become: yes
+- name: Ensure unwanted firewall defaults are disabled
+  firewalld:
+    service: "{{ item.service }}"
+    state: disabled
+    permanent: yes
+    immediate: yes
+    zone: "{{ item.zone }}"
+  with_items:
+    - { zone: dmz, service: ssh }
+    - { zone: home, service: dhcpv6-client }
+    - { zone: home, service: mdns }
+    - { zone: home, service: samba-client }
+    - { zone: home, service: ssh }
+    - { zone: internal, service: samba-client }
+    - { zone: public, service: dhcpv6-client }
+    - { zone: public, service: ssh }
+    - { zone: work, service: dhcpv6-client }
+    - { zone: work, service: ssh }
+  become: yes
+- name: Ensure certain inbound traffic is allowed
+  firewalld:
+    service: "{{ item.service }}"
+    state: enabled
+    permanent: yes
+    immediate: yes
+    zone: "{{ item.zone }}"
+  with_items:
+    - { zone: internal, service: ssh }
+    - { zone: internal, service: dhcp }
+  become: yes

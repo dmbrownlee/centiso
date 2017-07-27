@@ -1,0 +1,11 @@
+---
+- name: Ensure firewall permits traffic (dns)
+  firewalld:
+    service: "{{ item }}"
+    zone: internal
+    state: enabled
+    immediate: yes
+    permanent: yes
+  with_items:
+    - dns
+  become: yes

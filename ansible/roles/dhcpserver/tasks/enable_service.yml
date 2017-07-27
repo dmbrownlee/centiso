@@ -1,0 +1,9 @@
+---
+- name: Ensure ISC DHCP server is enabled and configured to boot at startup
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - dhcpd
+  become: yes
