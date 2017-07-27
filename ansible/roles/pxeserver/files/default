@@ -30,13 +30,13 @@ MENU INCLUDE pxelinux.cfg/graphics.conf
 LABEL server
 	MENU LABEL Install Generic ^Server (no GUI)
 	kernel vmlinuz
-	append initrd=initrd.img inst.repo=http://repomirror.example.com/centos/7/os/x86_64 inst.ks=http://repomirror.example.com/ks/ks.cfg ip=dhcp
+	append initrd=initrd.img inst.repo=http://repomirror.example.com/centos/7/os/x86_64 inst.ks=http://pxeserver.example.com/ks/ks.cfg ip=dhcp
 
 # Use the workstation-ks.cfg kickstart file to install a generic workstation over the network
 LABEL workstation
 	MENU LABEL Install Generic ^Workstation (GUI)
 	kernel vmlinuz
-	append initrd=initrd.img inst.repo=http://repomirror.example.com/centos/7/os/x86_64 inst.ks=http://repomirror.example.com/ks/workstation-ks.cfg ip=dhcp
+	append initrd=initrd.img inst.repo=http://repomirror.example.com/centos/7/os/x86_64 inst.ks=http://pxeserver.example.com/ks/workstation-ks.cfg ip=dhcp
 
 # Specify “rescue” on the kernel line to tell the installer to boot a rescue image over the network
 LABEL rescue

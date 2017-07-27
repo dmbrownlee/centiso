@@ -47,7 +47,7 @@
   lineinfile:
     path: "{{ docroot }}/ks/{{ item }}"
     regexp: '^cdrom$'
-    line: 'url --url http://10.1.1.254/centos/7/os/x86_64'
+    line: 'url --url http://repomirror.example.com/centos/7/os/x86_64'
   with_items:
     - ks.cfg
     - workstation-ks.cfg
