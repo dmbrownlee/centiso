@@ -13,6 +13,7 @@
     src: dnsmasq.conf.js
     backup: yes
   become: yes
+  notify: restart_dnsmasq
 - name: Ensure our own hostname is in the /etc/hosts so dnsmasq can resolve it
   lineinfile:
     path: /etc/hosts
