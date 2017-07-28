@@ -1,0 +1,82 @@
+# Global declarations that apply to all hosts, subnets, etc. go outside any
+# declarations. When specifying hosts in options, you can use hostnames or
+# IP addresses.
+
+#======================
+# <site>.example.com
+#======================
+# All site networks are in the 10.0.0.0/8 address space
+group {
+  option domain-name-servers dns1.example.com, dns2.example.com;
+  filename "pxelinux/pxelinux.0";
+  next-server "pxeserver.corp.google.com";
+  max-lease-time 120;
+  default-lease-time 120;
+  # DMZ
+  subnet 10.0.0.0 netmask 255.255.255.0 {
+    option routers 10.0.0.254;
+    option domain-name "dmz.example.com";
+  };
+  # Server network
+  subnet 10.1.1.0 netmask 255.255.255.0 {
+    option routers 10.1.1.254;
+    option domain-name "example.com";
+    # Addresses .1 - .99 are reserved for static reservations
+    host dns1 {
+      hostname dns1
+      hardware ethernet 08:00:27:00:00:01;
+      fixed-address 10.1.1.1;
+    };
+    # Dynamic address pool
+    pool {
+      range 10.1.1.100 10.1.1.253;
+      allow unknown-clients;
+    };
+  };
+  # Foo office, first floor
+  subnet 10.2.1.0 netmask 255.255.255.0 {
+    option routers 10.2.1.254;
+    option domain-name "foo1.example.com";
+  };
+  # Foo office, second floor
+  subnet 10.2.2.0 netmask 255.255.255.0 {
+    option routers 10.2.2.254;
+    option domain-name "foo2.example.com";
+  };
+  # Bar office, first floor
+  subnet 10.3.1.0 netmask 255.255.255.0 {
+    option routers 10.3.1.254;
+    option domain-name "bar1.example.com";
+  };
+};
+
+#======================
+# lab.example.com
+#======================
+# All labs are in the 172.16.0.0/12 address space and subnetted to /24
+# Note: These labs do not have PXE or DNS services and would need a DHCP relay
+group {
+  subnet 172.16.0.0 netmask 255.255.255.0 {
+    option routers 172.16.0.254;
+    option domain-name "lab0.example.com";
+  };
+  subnet 172.16.1.0 netmask 255.255.255.0 {
+    option routers 172.16.1.254;
+    option domain-name "lab1.example.com";
+  };
+  # etc...
+};
+
+#======================
+# guest.example.com
+#======================
+# This group is for a guest (wifi) network with no access to the organizations
+# internal network besides the DHCP relay
+group {
+  subnet 192.168.0.0 netmask 255.255.255.0
+    option routers 192.168.0.254;
+    option domain-name "guest.example.com";
+    option domain-name-servers 8.8.8.8;
+    max-lease-time 120;
+  };
+};

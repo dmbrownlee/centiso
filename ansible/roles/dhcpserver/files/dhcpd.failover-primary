@@ -1,0 +1,13 @@
+# Failover declaration - Primary
+failover peer "dhcp" {
+  primary;                        # This is the primary server of the pair
+  address dhcp1.example.com;      # Us
+  port 647;                       # Us - IANA assigned dhcp failover port
+  peer address dhcp2.example.com; # Them
+  peer port 647;                  # Them - IANA assigned dhcp failover port
+  max-response-delay 60;          # Seconds of silence before assuming failure
+  max-unacked-updates 10;         # un-ACKed
+  mclt 3600;                      # maximum client lead time - default: 1 hour
+  split 128;                      # request hash is 0-255; 128 divides evenly
+  load balance max seconds 3;
+}

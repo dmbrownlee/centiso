@@ -1,8 +1,12 @@
 ---
-- name: Ensure the dhcpd.cfg is copied
+- name: Ensure the dhcpd configuration is up to date
   copy:
-    dest: "/etc/dhcpd/{{ item }}"
+    dest: "/etc/dhcp/{{ item }}"
     src: "{{ item }}"
   with_items:
     - dhcpd.conf
+    - dhcpd.master
+    - dhcpd.failover-primary
+    - dhcpd.failover-secondary
   become: yes
+  notify: restart_dhcpd
