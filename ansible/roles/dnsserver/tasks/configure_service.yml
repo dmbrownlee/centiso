@@ -8,8 +8,9 @@
   become: yes
 - name: Ensure zone files are up to date
   template:
-    dest: "/etc/named.c/{{ item }}"
+    dest: "/etc/named/{{ item }}"
     src: "{{ item }}"
   with_items:
-    - 
+    - example.com.zone
+    - 1.1.10.in-addr.arpa.zone
   become: yes

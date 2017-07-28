@@ -1,0 +1,28 @@
+$ORIGIN example.com
+$TTL 86400
+@	IN	SOA	dns1.example.com.	admin.example.com. (
+			2017072801 ; serial
+			21600      ; refresh after 6 hours
+			3600	   ; retry after 1 hour
+			604800     ; expire after 1 week
+			86400      ; minimum TTL of 1 day
+)
+
+	IN	NS	dns1.example.com.
+	IN	NS	dns2.example.com.
+
+	IN	MX	smtp.example.com.
+
+	IN	A	10.1.1.10 ; This is the address of example.com
+
+dns1		IN	A	10.1.1.1
+dhcp1		IN	A	10.1.1.2
+;dhcp2		IN	A	10.1.1.3
+router		IN	A	10.1.1.254
+repomirror	IN	A	10.1.1.6
+web1		IN	A	10.1.1.10
+web2		IN	A	10.1.1.11
+web3		IN	A	10.1.1.12
+web4		IN	A	10.1.1.13
+
+pxeserver	IN	CNAME	router

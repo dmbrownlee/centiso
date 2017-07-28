@@ -1,0 +1,26 @@
+$ORIGIN 1.1.10.in-addr.arpa
+$TTL 86400
+@	IN	SOA	dns1.example.com.	admin.example.com. (
+			2017072801 ; serial
+			21600      ; refresh after 6 hours
+			3600	   ; retry after 1 hour
+			604800     ; expire after 1 week
+			86400      ; minimum TTL of 1 day
+)
+
+	IN	NS	dns1.example.com.
+	IN	NS	dns2.example.com.
+
+	IN	MX	smtp.example.com.
+
+	IN	A	10.1.1.10 ; This is the address of example.com
+
+254		IN	PTR	router
+1		IN	PTR	dns1
+2		IN	PTR	dhcp1
+;3		IN	PTR	dhcp2
+6		IN	PTR	repomirror
+10		IN	PTR	web1
+11		IN	PTR	web2
+12		IN	PTR	web3
+13		IN	PTR	web4
