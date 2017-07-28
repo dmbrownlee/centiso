@@ -1,0 +1,4 @@
+---
+iface_int: enp0s3
+iface_int_address: 10.1.1.1
+iface_int_prefix: 24
