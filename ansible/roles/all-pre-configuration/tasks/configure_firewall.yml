@@ -10,7 +10,7 @@
     state: started
     enabled: yes
   become: yes
-- name: Ensure the default zome is internal
+- name: Ensure the default zone is internal
   command: firewall-cmd --set-default-zone=internal
   become: yes
 - name: Ensure unwanted firewall defaults are disabled
