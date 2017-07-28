@@ -9,7 +9,7 @@
 group {
   option domain-name-servers dns1.example.com, dns2.example.com;
   filename "pxelinux/pxelinux.0";
-  next-server "pxeserver.example.com";
+  next-server pxeserver.example.com;
   max-lease-time 120;
   default-lease-time 120;
   # DMZ
