@@ -1,5 +1,5 @@
 ---
 - include: install_packages.yml
-- include: content_pxe.yml
+- include: configure_service.yml
 - include: enable_service.yml
 - include: configure_firewall.yml
