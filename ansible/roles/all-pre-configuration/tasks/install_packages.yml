@@ -8,7 +8,7 @@
     - RPM-GPG-KEY-EPEL-7
   become: yes
 - name: Ensure necessary packages are installed
-  yum:
+  package:
     name: "{{ item }}"
     state: present
   with_items:

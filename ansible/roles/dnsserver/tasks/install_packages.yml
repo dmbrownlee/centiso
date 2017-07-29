@@ -1,6 +1,6 @@
 ---
 - name: Ensure necessary packages are installed
-  yum:
+  package:
     name: "{{ item }}"
     state: present
   with_items:
