@@ -7,7 +7,7 @@
     - named.conf
   become: yes
 - name: Ensure zone files are up to date
-  template:
+  copy:
     dest: "/etc/named/{{ item }}"
     src: "{{ item }}"
   with_items:
