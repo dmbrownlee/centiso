@@ -15,8 +15,8 @@ chefserver.example.com
 [chefworkstation]
 workstation.example.com
 
-[dnsserver]
+[bind]
 dns1.example.com
 
-[dhcpserver]
+[isc-dhcp]
 dhcp1.example.com
