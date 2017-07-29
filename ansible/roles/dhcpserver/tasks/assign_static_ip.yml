@@ -1,6 +1,6 @@
 ---
 - name: Ensure network manager libs are installed
-  yum:
+  package:
     name: '{{ item }}'
     state: installed
   with_items:

@@ -7,7 +7,7 @@
     #- orgname: example
   tasks:
     - name: Ensure chefdk is already installed
-      yum:
+      package:
         name: chefdk
         state: present
       become: yes

@@ -10,7 +10,7 @@
     build_root: "{{ centiso_var }}/iso_build_root"
   tasks:
   - name: Ensure packages needed to build the ISO image are installed
-    yum:
+    package:
       name: "{{ item }}"
       state: present
     with_items:

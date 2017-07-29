@@ -1,6 +1,8 @@
 ---
 - name: Ensure necessary packages are installed
-  yum: name={{ item }} state=present
+  package:
+    name:  item }}
+    state: present
   become: yes
   with_items:
     - python-firewall
