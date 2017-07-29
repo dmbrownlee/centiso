@@ -22,13 +22,13 @@
   roles:
     - { role: chefworkstation, tags: chefworkstation }
 
-- hosts: dnsserver
+- hosts: bind
   roles:
-    - { role: dnsserver, tags: dnsserver }
+    - { role: bind, tags: bind }
 
-- hosts: dhcpserver
+- hosts: isc-dhcp
   roles:
-    - { role: dhcpserver, tags: dhcpserver }
+    - { role: isc-dhcp, tags: isc-dhcp }
 
 - hosts: all
   roles:
