@@ -5,7 +5,6 @@
     state: present
   with_items:
     - dnsmasq
-    - python-firewall
   become: yes
 - name: Ensure dnsmasq is configured
   template:
@@ -19,23 +18,12 @@
     path: /etc/hosts
     line: 10.1.1.254 router.example.com router pxeserver.example.com pxeserver repomirror.example.com repomirror
   become: yes
-- name: Ensure firewalld and dnsmasq are started and enabled at boot
+- name: Ensure dnsmasq is started and enabled at boot
   service:
     name: "{{ item }}"
     state: started
     enabled: yes
   with_items:
     - dnsmasq
-    - firewalld
   become: yes
-- name: Ensure internal dhcp and dns traffic is allowed
-  firewalld:
-    service: "{{ item.service }}"
-    state: enabled
-    permanent: yes
-    immediate: yes
-    zone: "{{ item.zone }}"
-  with_items:
-    - { zone: internal, service: dhcp }
-    - { zone: internal, service: dns }
-  become: yes
+- include: configure_firewall.yml

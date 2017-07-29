@@ -29,5 +29,6 @@
     immediate: yes
     zone: "{{ item.zone }}"
   with_items:
-    - { zone: internal, service: http }
+    - { zone: external, service: ssh }
+    - { zone: internal, service: ssh }
   become: yes
