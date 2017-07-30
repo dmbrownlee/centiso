@@ -75,16 +75,16 @@ case $HOST in
     new-vm router RedHat_64 2048 102400 both emptydrive
     ;;
   "repomirror")
-    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000006
+    new-vm repomirror RedHat_64 2048 102400 int emptydrive 080027000006
     ;;
   "dns1")
-    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000001
+    new-vm dns1 RedHat_64 2048 102400 int emptydrive 080027000001
     ;;
   "dhcp1")
     new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000002
     ;;
   "dhcp2")
-    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000003
+    new-vm dhcp2 RedHat_64 2048 102400 int emptydrive 080027000003
     ;;
   "chefserver")
     new-vm chefserver RedHat_64 2048 102400 int emptydrive 0800276F9FE1
@@ -96,16 +96,16 @@ case $HOST in
     new-vm mdtserver Windows2012_64 2048 102400 int emptydrive
     ;;
   "web1")
-    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000010
+    new-vm web1 RedHat_64 2048 102400 int emptydrive 080027000010
     ;;
   "web2")
-    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000011
+    new-vm web2 RedHat_64 2048 102400 int emptydrive 080027000011
     ;;
   "web3")
-    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000012
+    new-vm web3 RedHat_64 2048 102400 int emptydrive 080027000012
     ;;
   "web4")
-    new-vm dhcp1 RedHat_64 2048 102400 int emptydrive 080027000013
+    new-vm web4 RedHat_64 2048 102400 int emptydrive 080027000013
     ;;
   *)
     new-vm $@
