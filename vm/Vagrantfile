@@ -1,0 +1,339 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  # Vagrant is convenient for quickly spinning up VMs in VirtualBox for
+  # testing. However, that convenience comes with a price and that price is it
+  # requires the first network interface to be Internet accessible and have a
+  # user account with admin access who can login without a password. Yeah,
+  # scarry. However, I'm only using Vagrant for the convenience of creating the
+  # VMs. Once created we reinstall them via custom installation media or PXE
+  # booting on the "internal" virtual network. For now, I've decided to add a
+  # second network interface for the "internal" network and not futz with
+  # manually re-patching the first network interface but, maybe I will later.
+
+  # I make my own Vagrant base boxes and they already have the keys from this
+  # directory installed. You make your own keys with:
+  #
+  #   mkdir -m 700 ~/keys
+  #   cd ~/keys && ssh-keygen -t rsa -b 4096 -f vagrant -N "" -C "vagrant key"
+  #
+  # and then build your own base boxes by hand or using something like packer.
+
+  config.ssh.private_key_path = "~/keys/vagrant"
+
+  # In order to treat machines as disposable, you need a way to persist data
+  # that is separate from the system disk. On real machines, you might us NAS
+  # or a SAN with appropriate backups of that. Rather than build a VM just for
+  # that, I'm just using a second drive that can be detached before destroying
+  # a VM using it and reattaching it when the VM is rebuilt. The data is just a
+  # mirror of a CentOS repository so there is no need for a backup but syncing
+  # it the first time can take hours so it's better to do it once and persist
+  # the data. Do do this, I make a disk image residing outside of any VM
+  # directory, partition it, format it with xfs, and label it so I can tell
+  # anaconda to ignore it in the kickstart files. This is a one time manual
+  # process.
+  
+  persistent_disk = "/Users/dmb/VirtualBox VMs/var_www_html_centos.vdi" 
+
+  # These settngs are defaults that can be overridden in each machine specific
+  # section if needed.  Note, Vagrant has a requirement that every machine be
+  # connected to a public network in order to configure it remotely.  This
+  # means machines which would normally only need one interface on a private
+  # network have two, the first connected to VirtualBox's NAT network so
+  # Vagrant can configure them via forwarded ports on the host machine, and the
+  # second network interface which is connected to the private "internal"
+  # network and serves the same function as the only interface would on a non-
+  # Vagrant machine. Once Vagrant has spun up your VM, you should have your
+  # configuration management system disable the first interface. Of course,
+  # Vagrant will not be able to provision the system after that.
+
+  config.vm.box = "CentOS-7-x86_64-Minimal"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "2048"
+    vb.gui = true
+    vb.customize ["modifyvm", :id, "--ostype", "RedHat_64"]
+    vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+    vb.customize ["modifyvm", :id, "--nic2", "intnet",
+                                   "--intnet2", "internal",
+                                   "--nicpromisc2", "allow-vms",
+                                   "--cableconnected2", "on",
+                                   "--nictype2", "82540EM"]
+    vb.customize ["modifyvm", :id, "--boot1", "dvd"]
+    vb.customize ["modifyvm", :id, "--boot2", "disk"]
+    vb.customize ["modifyvm", :id, "--boot3", "none"]
+    vb.customize ["modifyvm", :id, "--boot4", "none"]
+    vb.customize ["modifyvm", :id, "--vram", "16"]
+    vb.customize ["modifyvm", :id, "--rtcuseutc", "on"]
+    vb.customize ["storageattach", :id, "--storagectl", "IDE Controller",
+                                        "--port", 0,
+                                        "--device", 1,
+                                        "--type", "dvddrive",
+                                        "--medium", "emptydrive"]
+  end
+  
+  # At first, we have something that resembles a simple home network with a
+  # consumer WiFI router doing NAT and DNS; a workstation called buildbox for
+  # creating kickstart files, building custom ISO images, acting as a local
+  # repository so we can work when disconnected, and other install server
+  # fuctions; and a machine for testing installs. We put both buildbox and the
+  # test machine on the NAT network and VirtualBox becomes the all-in-one
+  # router that connects them to the Internet. The NAT network will become the
+  # "external" network when we are done. Buildbox is installed manually using
+  # the NetBoot image, git is installed to pull down this project, and ansible
+  # is installed to configure everything else.
+
+  # router (Consumer WiFi router/VirtualBox)
+  #   - NAT router
+  #   - DNS
+  #     - only used to resolve internet addresses (caching server on .254)
+  #     - internal addresses are done via hosts file until DNS is deployed
+  #   - DHCP (don't use)
+  #     - unable to configure DHCP options needed to PXE boot
+  #     - will use fixed addresses for buildbox and other servers
+
+  # NO VM NEEDED: Use VirtualBox's built in NAT router
+  #   Note: When using VirtualBox as your NAT router, disable DHCP on the NAT
+  #         network.
+
+  # buildbox v1 (Install server)
+  #   - Installation:
+  #     - Use Netboot Image to install via mirror
+  #     - Include large, second disk for persistent storage between rebuilds
+  #       - mount on /var/www/centos
+  #     - Use static IP addressing
+  #     - Install httpd
+  #       - Create /var/www/html/ks for kickstart files and make it a git repo
+  #       - Mirror CentOS content to /var/www/centos
+  #   - Usage:
+  #     - Build and test kickstart file for a firewall
+  #     - Build and test kickstart file for buildbox v2 (on internal network)
+  #       - tftp: Serves pxelinux, etc. to PXE booting clients
+  #       - dhcp: Support PXE booting
+  #     - Create custom ISO images including kickstart files
+
+  config.vm.define "buildbox1" do |node|
+    node.vm.network "private_network", ip: "10.0.0.100",
+                                       virtualbox__null: true,
+                                       auto_config: false
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "buildbox1"
+      unless (system( "vboxmanage showvminfo buildbox1 2>/dev/null |grep -q 'SATA Controller'" )) then
+        vb.customize ["storagectl", :id, "--name", "SATA Controller",
+                                         "--add", "sata",
+                                         "--bootable", "off"]
+      end
+      vb.customize ["storageattach", :id, "--storagectl", "SATA Controller",
+                                          "--port", 0,
+                                          "--device", 0,
+                                          "--type", "hdd",
+                                          "--hotpluggable", "on",
+                                          "--medium", "#{persistent_disk}"]
+    end
+    # We use a SATA drive for persistant storage when rebuilding VMs. Add this
+    # trigger to make sure the drive is detached before destroying the virtual
+    # machine. 
+    node.trigger.before :destroy do
+      info "Dettach persistent SATA drive"
+      run "VBoxManage storageattach 'buildbox1' --storagectl 'SATA Controller' --port 0 --device 0 --type hdd --medium none"
+    end
+  end
+
+  # We then proceed to create, edit, and test kickstart files on our test
+  # machine. The first kickstart file creates a firewall to separate an
+  # "internal" (intnet) network from the "external" (NAT) we are currently on.
+  # This means the firewall VM will need a second network interface on
+  # "internal".
+
+  config.vm.define "firewall" do |node|
+    node.vm.network "private_network", ip: "10.0.0.100",
+                                       virtualbox__null: true,
+                                       auto_config: false
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "firewall"
+      vb.customize ["modifyvm", :id, "--nic3", "intnet",
+                                     "--intnet3", "dmz",
+                                     "--nicpromisc3", "allow-vms",
+                                     "--cableconnected3", "on",
+                                     "--nictype3", "82540EM"]
+    end
+  end
+
+  # Once firewall is successfully deployed, we create a second kickstart file
+  # to reproduce builbox on the internal network. Move the secondary drive with
+  # the repository mirror of CentOS between buildbox machines when testing to
+  # save time and space. When we have a working buildbox, you can remove the
+  # other after making certain the repository mirror drive is NOT still
+  # connected.
+
+  config.vm.define "buildbox2" do |node|
+    node.vm.network "private_network", ip: "10.0.0.100",
+                                       virtualbox__null: true,
+                                       auto_config: false
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "buildbox2"
+      unless (system( "vboxmanage showvminfo buildbox2 2>/dev/null |grep -q 'SATA Controller'" )) then
+        vb.customize ["storagectl", :id, "--name", "SATA Controller",
+                                         "--add", "sata",
+                                         "--bootable", "off"]
+      end
+      vb.customize ["storageattach", :id, "--storagectl", "SATA Controller",
+                                          "--port", 0,
+                                          "--device", 0,
+                                          "--type", "hdd",
+                                          "--hotpluggable", "on",
+                                          "--medium", "#{persistent_disk}"]
+    end
+    # We use a SATA drive for persistant storage when rebuilding VMs. Add this
+    # trigger to make sure the drive is detached before destroying the virtual
+    # machine. 
+    node.trigger.before :destroy do
+      info "Dettach persistent SATA drive"
+      run "VBoxManage storageattach 'buildbox2' --storagectl 'SATA Controller' --port 0 --device 0 --type hdd --medium none"
+    end
+  end
+
+  # The next kickstart file is a base server image containing the lowest common
+  # denomnator of installed software for a server.  We install servers via PXE
+  # booting.  The DHCP server on buildbox v2 has static reservations for each
+  # server so the IP address will be known.  PXE can use the IP address to boot
+  # an alternate kickstart file or install the base server image and let the
+  # configuration management system determine how to configure the system based
+  # on IP, hostname, and/or MAC address.
+
+  config.vm.define "dns1" do |node|
+    node.vm.network "private_network", ip: "10.0.0.100",
+                                       virtualbox__null: true,
+                                       auto_config: false
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "dns1"
+      vb.customize ["modifyvm", :id, "--macaddress2", "080027000001"]
+    end
+  end
+
+  config.vm.define "dhcp1" do |node|
+    node.vm.network "private_network", ip: "10.0.0.100",
+                                       virtualbox__null: true,
+                                       auto_config: false
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "dhcp1"
+      vb.customize ["modifyvm", :id, "--macaddress2", "080027000002"]
+    end
+  end
+
+  config.vm.define "dhcp2" do |node|
+    node.vm.network "private_network", ip: "10.0.0.100",
+                                       virtualbox__null: true,
+                                       auto_config: false
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "dhcp2"
+      vb.customize ["modifyvm", :id, "--macaddress2", "080027000003"]
+    end
+  end
+
+  config.vm.define "chefserver" do |node|
+    node.vm.network "private_network", ip: "10.0.0.100",
+                                       virtualbox__null: true,
+                                       auto_config: false
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "chefserver"
+      vb.customize ["modifyvm", :id, "--macaddress2", "0800276F9FE1"]
+    end
+  end
+
+  config.vm.define "web1" do |node|
+    node.vm.network "private_network", ip: "10.0.0.100",
+                                       virtualbox__null: true,
+                                       auto_config: false
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "web1"
+      vb.customize ["modifyvm", :id, "--macaddress2", "080027000010"]
+    end
+  end
+
+  config.vm.define "web2" do |node|
+    node.vm.network "private_network", ip: "10.0.0.100",
+                                       virtualbox__null: true,
+                                       auto_config: false
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "web2"
+      vb.customize ["modifyvm", :id, "--macaddress2", "080027000011"]
+    end
+  end
+
+  config.vm.define "web3" do |node|
+    node.vm.network "private_network", ip: "10.0.0.100",
+                                       virtualbox__null: true,
+                                       auto_config: false
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "web3"
+      vb.customize ["modifyvm", :id, "--macaddress2", "080027000012"]
+    end
+  end
+
+  
+  config.vm.define "web4" do |node|
+    node.vm.network "private_network", ip: "10.0.0.100",
+                                       virtualbox__null: true,
+                                       auto_config: false
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "web4"
+      vb.customize ["modifyvm", :id, "--macaddress2", "080027000013"]
+    end
+  end
+
+  # Even if Windows base boxes are possible, there is sure to be licensing
+  # issues that need to be sorted before going here.  This is a carry over from
+  # using a shell script to create the VM but, while it created the VM, the
+  # shell script did not install the OS and that had to be done from
+  # installation media.
+  #
+  #  config.vm.define "mdtserver" do |node|
+  #    node.vm.box = "Windows 2012"
+  #    node.vm.network "private_network", ip: "10.0.0.100",
+  #                                       virtualbox__null: true,
+  #                                       auto_config: false
+  #    node.vm.provider "virtualbox" do |vb|
+  #      vb.name = "mdtserver"
+  #      vb.customize ["modifyvm", :id, "--ostype", "Windows2012_64"]
+  #      vb.customize ["modifyvm", :id, "--macaddress2", "080027000009"]
+  #    end
+  #  end
+
+  # Finally, we create a base workstation image to use the network we built.
+
+  config.vm.define "workstation" do |node|
+    node.vm.network "private_network", ip: "10.0.0.100",
+                                       virtualbox__null: true,
+                                       auto_config: false
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "workstation"
+    end
+  end 
+
+  # With kickstart files in hand, we proceed to create a custom ISO image that
+  # includes a menu from which you can select one of the kickstart files to use
+  # to drive an install from the custom ISO image. Remember, the one server you
+  # cannot install using PXE is the buildbox (PXE server) so you should have a
+  # menu option to install that from your custom media and that means the
+  # custom media should probably be based on the Eveything ISO to maximize what
+  # you can make available via local repo mirror when you have no connectivity
+  # to the Internet.
+
+  # These are just generic machines. Like a store bought PC, we don't care
+  # about what OS vagrant has preinstalled since we will be reimaging them on
+  # the network anyway.
+
+  ["host1","host2","host3","host3","host3","host3"].each do |host|
+    config.vm.define "#{host}" do |node|
+      node.vm.network "private_network", ip: "10.0.0.100",
+                                         virtualbox__null: true,
+                                         auto_config: false
+      node.vm.provider "virtualbox" do |vb|
+        vb.name = "#{host}"
+      end
+    end
+  end
+end
