@@ -1,0 +1,64 @@
+# This ansible task is used to sync the contents of a CentOS mirror site with
+# /var/www/html/centos. It is NOT used to maintain the local mirror service or
+# the exclude lists. Run this task manually when you want to do the initial
+# sync of content and whenever you want to freshen the contents of your local
+# repository mirror.
+---
+- hosts: localhost
+  vars:
+    mirror_base: 'rsync://centos.eecs.wsu.edu'
+    release_major: '7'
+    release_full: '7.3.1611'
+    docroot: '/var/www/html'
+  tasks:
+  - name: Test for {{ docroot }}/centos directory
+      stat:
+        path: "{{ docroot }}/centos"
+      register: path
+  - Fail:
+      msg: "{{ docroot }}/centos is missing or not a directory"
+    when: not path.stat.isdir is defined or not path.stat.isdir
+  - name: Ensure repo subdirectories exists
+    file:
+      path: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64"
+      state: directory
+    with_items:
+      - os
+      - isos
+      - updates
+      - centosplus
+      - extras
+      - local
+    become: yes
+  - name: Ensure release link exists
+    file:
+      path: "{{ docroot }}/centos/{{ release_major }}"
+      src: "{{ docroot }}/centos/{{ release_full }}"
+      state: link
+    become: yes
+  #- name: Ensure exclude lists are installed before syncing
+  #  copy:
+  #    dest: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/exclude.list"
+  #    src: "{{ item }}.list"
+  #  with_items:
+  #    - os
+  #    - isos
+  #    - updates
+  #    - centosplus
+  #    - extras
+  #  become: yes
+  - name: Ensure local repo is synced with mirror
+    synchronize:
+      mode: pull
+      dest: "{{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/"
+      src: "{{ mirror_base }}/{{ release_full }}/{{ item }}/x86_64/"
+      rsync_opts:
+        - "--exclude-from={{ docroot }}/centos/{{ release_full }}/{{ item }}/x86_64/exclude.list"
+        - "--exclude=exclude.list"
+    with_items:
+      - os
+      - isos
+      - updates
+      - centosplus
+      - extras
+    delegate_to: "{{ inventory_hostname }}"

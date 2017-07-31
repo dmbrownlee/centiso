@@ -1,23 +1,40 @@
 ---
-# Create localpkgs repo
-- name: Ensure directories for building the new ISO image exist
-  file:
-    path: "{{ localpkgs }}/Packages"
-    state: directory
-  become: yes
-- name: Ensure the chefdk RPM has been downloaded
-  get_url:
-    url: "https://packages.chef.io/files/stable/chefdk/1.4.3/el/7/chefdk-1.4.3-1.el7.x86_64.rpm"
-    dest: "{{ localpkgs }}/Packages/chefdk-1.4.3-1.el7.x86_64.rpm"
-    checksum: "sha256:bb70be05a6a99071d26ec288d338459fe71fdd6ab0e4cbb661ae66dfb6c82fc5"
-  become: yes
-- name: Ensure the chef-server-core RPM has been downloaded
-  get_url:
-    url: "https://packages.chef.io/files/stable/chef-server/12.15.8/el/7/chef-server-core-12.15.8-1.el7.x86_64.rpm"
-    dest: "{{ localpkgs }}/Packages/chef-server-core-12.15.8-1.el7.x86_64.rpm"
-    checksum: "sha256:a39b70bbbc8ba60d54c827d2a002f7b1d4f48629f8316ae59ae21ab2c73396d8"
-  become: yes
-- name: Ensure the repodata has been updated
-  command: "createrepo ."
-  args:
-    chdir: "{{ localpkgs }}"
+# This ansible task is used to fetch certain RPMs from the Internet and add
+# them to our local repository. It is NOT used to create or maintain the local
+# directory itself as it shoul already exist. Run this task manually when you
+# want to do the initial sync of content and whenever you want to make sure it
+# is current before building an ISO image.
+---
+- hosts: localhost
+  vars:
+    docroot: '/var/www/html'
+    release_full: '7.3.1611'
+    localpkgs: "{{ docroot }}/centos/{{ release_full }}/localpkgs/x86_64"
+  tasks:
+  - name: Test for {{ localpkgs }}/Packages directory
+      stat:
+        path: "{{ localpkgs }}/Packages"
+      register: path
+  - Fail:
+      msg: "{{ localpkgs }}/Packages is missing or not a directory"
+    when: not path.stat.isdir is defined or not path.stat.isdir
+
+  # Add any RPMs you would like to download to the local repository here.
+  - name: Ensure the chefdk RPM has been downloaded
+    get_url:
+      url: "https://packages.chef.io/files/stable/chefdk/1.4.3/el/7/chefdk-1.4.3-1.el7.x86_64.rpm"
+      dest: "{{ localpkgs }}/Packages/chefdk-1.4.3-1.el7.x86_64.rpm"
+      checksum: "sha256:bb70be05a6a99071d26ec288d338459fe71fdd6ab0e4cbb661ae66dfb6c82fc5"
+    become: yes
+  - name: Ensure the chef-server-core RPM has been downloaded
+    get_url:
+      url: "https://packages.chef.io/files/stable/chef-server/12.15.8/el/7/chef-server-core-12.15.8-1.el7.x86_64.rpm"
+      dest: "{{ localpkgs }}/Packages/chef-server-core-12.15.8-1.el7.x86_64.rpm"
+      checksum: "sha256:a39b70bbbc8ba60d54c827d2a002f7b1d4f48629f8316ae59ae21ab2c73396d8"
+    become: yes
+
+  # After all packages have been downloaded, update the repodata.
+  - name: Ensure the repodata has been updated
+    command: "createrepo ."
+    args:
+      chdir: "{{ localpkgs }}"
