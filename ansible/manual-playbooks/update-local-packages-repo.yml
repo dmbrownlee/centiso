@@ -1,4 +1,3 @@
----
 # This ansible task is used to fetch certain RPMs from the Internet and add
 # them to our local repository. It is NOT used to create or maintain the local
 # directory itself as it shoul already exist. Run this task manually when you
