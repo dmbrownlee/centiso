@@ -1,0 +1,10 @@
+# This ansible is a shortcut for configuring git (I'm that lazy)
+---
+- hosts: localhost
+  vars:
+    gituser: 'dmbrownlee'
+  tasks:
+  - name: Ensure git user.name is set
+    command: git config --global user.name {{ gituser }}
+  - name: Ensure git user.email is set
+    command: git config --global user.email {{ gituser }}@users.noreply.github.com
